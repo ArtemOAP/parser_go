@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -18,7 +19,7 @@ const DIR_SITE = "sites/"
 type parserOnePage struct {
 	timeSleep      int
 	gol            int
-	tempCookies    string
+	tempCookies    []*http.Cookie
 	tempName       string
 	temp_files_src map[string]string
 	rootDir        string
@@ -55,7 +56,8 @@ func main() {
 	res = parser.filterFileName("//imeg.jpg?dfdf=1&f=434")
 	fmt.Println(res)
 	//parser.parsePage("https://toster.ru/q/431978")
-
+	parser.baseLink = "https://toster.ru/q/431978"
+	parser.run()
 }
 
 func (p *parserOnePage) run() *parserOnePage {
@@ -72,36 +74,130 @@ func (p *parserOnePage) run() *parserOnePage {
 	return p
 }
 func (p *parserOnePage) parsePage(link string) {
-
 	res, err := http.Get(link)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	doc, err := goquery.NewDocumentFromResponse(res)
+	p.thenBaseHref(doc)
+	p.saveIco(doc)
+	p.saveModifyElemHref(doc)
+	p.saveModifyIframe(doc)
+	p.saveModifyJs(doc)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	doc.Find("a").Each(func(i int, s *goquery.Selection) {
-		link, _ := s.Attr("href")
-		fmt.Println(link)
-	})
 
 	p.save(doc, ".")
 }
 
-/**
-  function save($filepath='')
-    {
-        $ret = $this->root->innertext();
-        if ($filepath!=='') file_put_contents($filepath, $ret, LOCK_EX);
-        return $ret;
-    }
-**/
+func (p *parserOnePage) thenBaseHref(doc *goquery.Document) {
+	doc.Find("base").Remove()
+}
+
+func (p *parserOnePage) saveIco(doc *goquery.Document) {
+	doc.Find("link[rel=icon],link[rel=apple-touch-icon]").Each(func(i int, s *goquery.Selection) {
+		link, _ := s.Attr("href")
+		if link != "" {
+			link = urlAbsolute(link, p.baseLink)
+			name := p.filterFileName(link)
+			p.saveFile(link, p.dirs["img"], name)
+			s.SetAttr("href", p.dirs["img_r"]+name)
+		}
+	})
+}
+
+func (p *parserOnePage) saveModifyElemHref(doc *goquery.Document) {
+
+	doc.Find("a").Each(func(i int, s *goquery.Selection) {
+		s.SetAttr("href", p.hrefAllLinks)
+
+		if t, _ := s.Attr("target"); t != "" {
+			s.RemoveAttr("target")
+		}
+		if t, _ := s.Attr("onclick"); t != "" {
+			s.RemoveAttr("onclick")
+		}
+
+	})
+}
+
+func (p *parserOnePage) saveModifyIframe(doc *goquery.Document) {
+	if p.notIframe {
+		doc.Find("iframe").Each(func(i int, s *goquery.Selection) {
+			s.Remove()
+		})
+	}
+}
+
+func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
+
+	reg3 := regexp.MustCompile(`~^https:\/\/ajax.googleapis.com~`)
+
+	doc.Find("script").Each(func(i int, s *goquery.Selection) {
+		src, _ := s.Attr("src")
+		if src != "" {
+			if !reg3.MatchString(src) {
+				name := p.filterFileName(src)
+				s.SetAttr("src", p.dirs["js_r"]+name)
+				if _, err := os.Stat(p.dirs["js"] + name); os.IsNotExist(err) {
+
+					link := urlAbsolute(src, p.baseLink)
+					client := &http.Client{}
+					req, err := http.NewRequest("GET", link, nil)
+					if err == nil {
+						req.Header.Set("Accept-language", "en")
+						req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+						if len(p.tempCookies) > 0 {
+							for _, c := range p.tempCookies {
+								req.AddCookie(c)
+							}
+						}
+
+						resp, err := client.Do(req)
+						if err == nil && resp.StatusCode == 200 {
+							fmt.Println(p.dir)
+							defer resp.Body.Close()
+							p.tempCookies = resp.Cookies()
+
+							out, err := os.Create(p.dirs["js"] + name)
+							defer out.Close()
+							if err == nil {
+								io.Copy(out, resp.Body)
+							}
+						}
+
+					}
+
+				}
+
+			}
+		}
+
+	})
+
+}
+
+func (p *parserOnePage) saveFile(url string, patch string, name string) {
+	res, err := http.Get(url)
+
+	if err == nil && res.StatusCode == 200 {
+		fmt.Println(p.dir)
+		defer res.Body.Close()
+		out, err := os.Create(patch + name)
+		defer out.Close()
+		if err == nil {
+			io.Copy(out, res.Body)
+		}
+	}
+}
 
 func (p *parserOnePage) save(doc *goquery.Document, filePatch string) {
 
-	file, err := os.Create("result.txt")
+	dir, _ := os.Getwd()
+
+	file, err := os.Create(dir + "/" + p.tempName + "/" + p.indFile)
 	if err != nil {
 		log.Fatal("Cannot create file", err)
 	}
@@ -167,6 +263,9 @@ func (p *parserOnePage) setHrefAllLinks(hrefAllLinks string) *parserOnePage {
 
 func (p *parserOnePage) setOptions() {
 
+	if p.dirAgent == "" {
+		p.setAgentMob(false)
+	}
 	p.dirs["css"] = p.rootDir + "/" + p.tempName + "/" + p.dirAgent + "/css/"
 	p.dirs["css_r"] = p.dirAgent + "/css/"
 	p.dirs["js"] = p.rootDir + "/" + p.tempName + "/" + p.dirAgent + "/js/"
@@ -204,7 +303,7 @@ func getInstance() *parserOnePage {
 			timeSleep:      10,
 			gol:            2,
 			temp_files_src: make(map[string]string),
-			rootDir:      ".",
+			rootDir:        ".",
 			hrefAllLinks:   "#",
 			mobAgent:       "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
 			descAgent:      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
@@ -212,10 +311,10 @@ func getInstance() *parserOnePage {
 			countLink:      1,
 			dirs:           make(map[string]string),
 			index:          "index.php",
-			script:    "<?php  $useragent=$_SERVER['HTTP_USER_AGENT'];   if(preg_match('/(android|bb\\d+|meego).+mobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i',$useragent)||preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\\-(n|u)|c55\\/|capi|ccwa|cdm\\-|cell|chtm|cldc|cmd\\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\\-s|devi|dica|dmob|do(c|p)o|ds(12|\\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\\-|_)|g1 u|g560|gene|gf\\-5|g\\-mo|go(\\.w|od)|gr(ad|un)|haie|hcit|hd\\-(m|p|t)|hei\\-|hi(pt|ta)|hp( i|ip)|hs\\-c|ht(c(\\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\\-(20|go|ma)|i230|iac( |\\-|\\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\\/)|klon|kpt |kwc\\-|kyo(c|k)|le(no|xi)|lg( g|\\/(k|l|u)|50|54|\\-[a-w])|libw|lynx|m1\\-w|m3ga|m50\\/|ma(te|ui|xo)|mc(01|21|ca)|m\\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\\-2|po(ck|rt|se)|prox|psio|pt\\-g|qa\\-a|qc(07|12|21|32|60|\\-[2-7]|i\\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\\-|oo|p\\-)|sdk\\/|se(c(\\-|0|1)|47|mc|nd|ri)|sgh\\-|shar|sie(\\-|m)|sk\\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\\-|v\\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\\-|tdg\\-|tel(i|m)|tim\\-|t\\-mo|to(pl|sh)|ts(70|m\\-|m3|m5)|tx\\-9|up(\\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\\-|your|zeto|zte\\-/i',substr($useragent,0,4)))  {      require_once ('index2.php');      die();  }  ?>",
-			notIframe: true,
-			ajax:      false,
-			dir:       DIR_SITE,
+			script:         "<?php  $useragent=$_SERVER['HTTP_USER_AGENT'];   if(preg_match('/(android|bb\\d+|meego).+mobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i',$useragent)||preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\\-(n|u)|c55\\/|capi|ccwa|cdm\\-|cell|chtm|cldc|cmd\\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\\-s|devi|dica|dmob|do(c|p)o|ds(12|\\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\\-|_)|g1 u|g560|gene|gf\\-5|g\\-mo|go(\\.w|od)|gr(ad|un)|haie|hcit|hd\\-(m|p|t)|hei\\-|hi(pt|ta)|hp( i|ip)|hs\\-c|ht(c(\\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\\-(20|go|ma)|i230|iac( |\\-|\\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\\/)|klon|kpt |kwc\\-|kyo(c|k)|le(no|xi)|lg( g|\\/(k|l|u)|50|54|\\-[a-w])|libw|lynx|m1\\-w|m3ga|m50\\/|ma(te|ui|xo)|mc(01|21|ca)|m\\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\\-2|po(ck|rt|se)|prox|psio|pt\\-g|qa\\-a|qc(07|12|21|32|60|\\-[2-7]|i\\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\\-|oo|p\\-)|sdk\\/|se(c(\\-|0|1)|47|mc|nd|ri)|sgh\\-|shar|sie(\\-|m)|sk\\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\\-|v\\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\\-|tdg\\-|tel(i|m)|tim\\-|t\\-mo|to(pl|sh)|ts(70|m\\-|m3|m5)|tx\\-9|up(\\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\\-|your|zeto|zte\\-/i',substr($useragent,0,4)))  {      require_once ('index2.php');      die();  }  ?>",
+			notIframe:      true,
+			ajax:           false,
+			dir:            DIR_SITE,
 		}
 	}
 
@@ -305,11 +404,11 @@ func (p *parserOnePage) filterFileName(href string) string {
 
 func (p *parserOnePage) setAgentMob(isMob bool) *parserOnePage {
 	if isMob {
-		p.mobAgent = "mob"
+		p.dirAgent = "mob"
 		p.userAgent = p.mobAgent
 		return p
 	}
-	p.mobAgent = "distr"
+	p.dirAgent = "distr"
 	p.userAgent = p.descAgent
 	return p
 }
