@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"io"
 	"log"
@@ -43,6 +44,8 @@ type parserOnePage struct {
 
 var instance *parserOnePage
 
+var ch chan int
+
 func main() {
 
 	parser := getInstance()
@@ -57,7 +60,24 @@ func main() {
 	fmt.Println(res)
 	//parser.parsePage("https://toster.ru/q/431978")
 	parser.baseLink = "https://toster.ru/q/431978"
-	parser.run()
+
+	//parser.run()
+	e := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	ch := make(chan int)
+	st()
+	go ex()
+	for _, v := range e {
+		ch <- v
+
+	}
+}
+func ex() {
+	d := <-ch
+	fmt.Println(d)
+}
+
+func st() {
+
 }
 
 func (p *parserOnePage) run() *parserOnePage {
@@ -84,6 +104,7 @@ func (p *parserOnePage) parsePage(link string) {
 	p.saveModifyElemHref(doc)
 	p.saveModifyIframe(doc)
 	p.saveModifyJs(doc)
+	p.saveModifayCss(doc)
 
 	if err != nil {
 		log.Fatal(err)
@@ -178,6 +199,130 @@ func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 	})
 
 }
+
+/**
+
+ public function saveModifayCss($page)
+    {
+        foreach ($page->find('link[rel=stylesheet]') as $key => $css) {
+
+            if (preg_match('/^https:\/\/fonts.googleapis.com/', $css->href) ||
+                preg_match('/^http:\/\/ajax.googleapis.com/', $css->href)
+            ) {
+                // пропускаем <link href="https://fonts.googleapis.com/css?family=Prompt:400,400i,700&amp;subset=thai,vietnamese" rel="stylesheet"/>
+                continue;
+            }
+            $name = $this->filterfileName($css->href);
+
+            if ($css->href) {
+                $linkCss    = $this->uri2absolute($css->href, $this->baseLink);
+                $linkDirCss = substr($linkCss, 0, strrpos($linkCss, '/') + 1);
+
+                $result_replace_url = preg_replace_callback('/url\((.*?)\)/',
+                    function ($matches) use ($linkDirCss) {
+                        return 'url(' . $this->getfile($matches[1], $linkDirCss) . ' )';
+                    }
+                    , $this->getContentFile($css->href));
+
+                $result_replace_import = preg_replace_callback('/@import "(.*?)"/',
+                    function ($matches) use ($linkDirCss) {
+                        return '@import "' . $this->getfile($matches[1], $linkDirCss) . '"';
+                    }, $result_replace_url);
+
+                if (!file_exists($this->dirs['css'] . $name) && $this->getContentFile($css->href)) {
+                    $this->message('➤ find css :', $name);
+                    file_put_contents($this->dirs['css'] . $name, $result_replace_import);
+                }
+
+                if ($css->href) {
+                    $css->href = $this->dirs['css_r'] . $name;
+
+                }
+            }
+        };
+    }
+**/
+
+
+func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
+
+	reg1 := regexp.MustCompile(`/^https:\/\/fonts.googleapis.com/`)
+	reg2 := regexp.MustCompile(`/^http:\/\/ajax.googleapis.com/`)
+	reg3 := regexp.MustCompile(`/url\((.*?)\)/`)
+
+	doc.Find("link[rel=stylesheet]").Each(func(i int, s *goquery.Selection) {
+		href, _ := s.Attr("href")
+		if href != "" && !reg1.MatchString(href) && !reg2.MatchString(href) {
+
+			name := p.filterFileName(href)
+			linkDirCss := substrFind(href, '/')
+
+			reg3.ReplaceAllStringFunc()
+		}
+
+	})
+}
+
+/**
+
+ public function getfile($link, $url,$html=false)
+    {
+
+        list($newLink, $name) = $this->srcFilter($link);
+
+        if (!file_exists($this->dirs['src'] . $name)) {
+            $this->message('find src for css :',$newLink);
+            $connectLink = function ($newLink) use ($url) {
+                if (!preg_match('/^https:/', $newLink) && !preg_match('/^http:/', $newLink)) {
+                    return $this->uri2absolute($newLink, $url);
+                }
+                return $newLink;
+            };
+            $this->temp_files_src[$name]=$connectLink($newLink);
+            $this->message('connecting url:',$this->temp_files_src[$name]);
+        }
+        if($html){
+            return '' . $this->dirs['src_r'] . $name;
+        }
+        return '../../' . $this->dirs['src_r'] . $name;
+    }
+
+**/
+
+func (p *parserOnePage) getfileSrc(link string, url string, at_html bool) {
+
+	newlink, name := p.srcFilter(link)
+	if _, err := os.Stat(p.dirs["src"] + name); os.IsNotExist(err) {
+		message("find src for css :", newlink)
+		connectLink := func() string {
+			reg := regexp.MustCompile(`/^htt(p|ps):/`)
+			if !reg.MatchString(newlink) {
+				return urlAbsolute(newlink, url)
+			}
+			return newlink
+		}
+
+	}
+
+}
+
+func (p *parserOnePage) srcFilter(link string) (string, string) {
+	newlink := strings.Trim(link, "\"'")
+	reg1 := regexp.MustCompile(`(\S+\.(png|jpg|gif|jpeg)$)`)
+	reg2 := regexp.MustCompile(`/[a-zA-Z,0-9,-]+\.(ttf|svg|woff|woff2)/`)
+	reg4 := regexp.MustCompile(`/(^(.+)\//)(/\?.+)/`)
+
+	reg5 := regexp.MustCompile(`(^(.+)\/)|(\?.+)`)
+	name := reg5.ReplaceAllStringFunc("sdsdsd/dadasd/qqqqq?dfdfdf", func(st string) string {
+		return ""
+	})
+	if !reg1.MatchString(newlink) && !reg2.MatchString(newlink) {
+		name = MD5(name)
+	}
+	return newlink, name
+}
+
+//saveModifayCss
 
 func (p *parserOnePage) saveFile(url string, patch string, name string) {
 	res, err := http.Get(url)
@@ -419,4 +564,20 @@ func message(args ...string) {
 		string += str + " "
 	}
 	fmt.Printf("%s\n", string)
+}
+
+func substrFind(str string, s rune) string {
+	i := 0
+	k := '0'
+	newString := []rune(str)
+	for i, k = range newString {
+		if s == k {
+			break
+		}
+	}
+	return string(newString[:i])
+}
+
+func MD5(s string) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
 }
