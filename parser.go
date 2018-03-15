@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"io/ioutil"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -165,39 +166,47 @@ func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 				if _, err := os.Stat(p.dirs["js"] + name); os.IsNotExist(err) {
 
 					link := urlAbsolute(src, p.baseLink)
-					client := &http.Client{}
-					req, err := http.NewRequest("GET", link, nil)
-					if err == nil {
-						req.Header.Set("Accept-language", "en")
-						req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-						if len(p.tempCookies) > 0 {
-							for _, c := range p.tempCookies {
-								req.AddCookie(c)
-							}
+					_,response:= p.request(link)
+					if response != nil{
+						out, err := os.Create(p.dirs["js"] + name)
+						defer out.Close()
+						if err == nil {
+							io.Copy(out, response.Body)
 						}
-
-						resp, err := client.Do(req)
-						if err == nil && resp.StatusCode == 200 {
-							fmt.Println(p.dir)
-							defer resp.Body.Close()
-							p.tempCookies = resp.Cookies()
-
-							out, err := os.Create(p.dirs["js"] + name)
-							defer out.Close()
-							if err == nil {
-								io.Copy(out, resp.Body)
-							}
+					}
+					
 						}
 
 					}
 
-				}
-
-			}
-		}
-
+				}	
 	})
 
+}
+
+func (p *parserOnePage) request(url string) (error, *http.Response) {
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		//TODO log
+		return err, nil
+	}
+		req.Header.Set("Accept-language", "en")
+		req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+		if len(p.tempCookies) > 0 {
+			for _, c := range p.tempCookies {
+				req.AddCookie(c)
+			}
+		}
+		resp, err := client.Do(req)
+		defer resp.Body.Close()
+		if err != nil || resp.StatusCode == 200 {
+			//TODO log
+			return err, nil
+		}
+		p.tempCookies = resp.Cookies()
+		return nil, resp
 }
 
 /**
@@ -243,77 +252,72 @@ func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
     }
 **/
 
-
 func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 
 	reg1 := regexp.MustCompile(`/^https:\/\/fonts.googleapis.com/`)
 	reg2 := regexp.MustCompile(`/^http:\/\/ajax.googleapis.com/`)
 	reg3 := regexp.MustCompile(`/url\((.*?)\)/`)
+	reg4 := regexp.MustCompile(`/@import "(.*?)"/`)
 
 	doc.Find("link[rel=stylesheet]").Each(func(i int, s *goquery.Selection) {
 		href, _ := s.Attr("href")
 		if href != "" && !reg1.MatchString(href) && !reg2.MatchString(href) {
 
-			name := p.filterFileName(href)
-			linkDirCss := substrFind(href, '/')
+			_,response:= p.request(href)
+			if response != nil{
+				
+				bodyb,_ := ioutil.ReadAll(response.Body)
 
-			reg3.ReplaceAllStringFunc()
+				name := p.filterFileName(href)
+				linkDirCss := substrFind(href, '/')
+				result_replace_url:= reg3.ReplaceAllStringFunc(string(bodyb),func(str string)string{
+					return "url(" +p.getfileSrc(str,linkDirCss,false) + ")"
+				})
+				result_replace_import:= reg4.ReplaceAllStringFunc(result_replace_url,func(str string)string{
+					return "url(" +p.getfileSrc(str,linkDirCss,false) + ")"
+				})
+
+
+				
+			}
 		}
 
 	})
+
 }
 
-/**
-
- public function getfile($link, $url,$html=false)
-    {
-
-        list($newLink, $name) = $this->srcFilter($link);
-
-        if (!file_exists($this->dirs['src'] . $name)) {
-            $this->message('find src for css :',$newLink);
-            $connectLink = function ($newLink) use ($url) {
-                if (!preg_match('/^https:/', $newLink) && !preg_match('/^http:/', $newLink)) {
-                    return $this->uri2absolute($newLink, $url);
-                }
-                return $newLink;
-            };
-            $this->temp_files_src[$name]=$connectLink($newLink);
-            $this->message('connecting url:',$this->temp_files_src[$name]);
-        }
-        if($html){
-            return '' . $this->dirs['src_r'] . $name;
-        }
-        return '../../' . $this->dirs['src_r'] . $name;
-    }
-
-**/
-
-func (p *parserOnePage) getfileSrc(link string, url string, at_html bool) {
+func (p *parserOnePage) getfileSrc(link string, url string, at_html bool) string {
 
 	newlink, name := p.srcFilter(link)
-	if _, err := os.Stat(p.dirs["src"] + name); os.IsNotExist(err) {
-		message("find src for css :", newlink)
-		connectLink := func() string {
-			reg := regexp.MustCompile(`/^htt(p|ps):/`)
-			if !reg.MatchString(newlink) {
-				return urlAbsolute(newlink, url)
-			}
-			return newlink
-		}
-
+	if _, err := os.Stat(p.dirs["src"] + name); !os.IsNotExist(err) {
+		//TODO logs
+		return ""
 	}
+	message("find src for css :", newlink)
+	connectLink := func() string {
+		reg := regexp.MustCompile(`/^htt(p|ps):/`)
+		if !reg.MatchString(newlink) {
+			return urlAbsolute(newlink, url)
+		}
+		return newlink
+	}
+	p.temp_files_src[name] = connectLink()
+	message("connecting url:", p.temp_files_src[name])
 
+	path := ""
+	if !at_html {
+		path = "../../"
+	}
+	path += p.dirs["src_r"]
+	return path + name
 }
 
 func (p *parserOnePage) srcFilter(link string) (string, string) {
 	newlink := strings.Trim(link, "\"'")
 	reg1 := regexp.MustCompile(`(\S+\.(png|jpg|gif|jpeg)$)`)
 	reg2 := regexp.MustCompile(`/[a-zA-Z,0-9,-]+\.(ttf|svg|woff|woff2)/`)
-	reg4 := regexp.MustCompile(`/(^(.+)\//)(/\?.+)/`)
-
 	reg5 := regexp.MustCompile(`(^(.+)\/)|(\?.+)`)
-	name := reg5.ReplaceAllStringFunc("sdsdsd/dadasd/qqqqq?dfdfdf", func(st string) string {
+	name := reg5.ReplaceAllStringFunc(newlink, func(st string) string {
 		return ""
 	})
 	if !reg1.MatchString(newlink) && !reg2.MatchString(newlink) {
