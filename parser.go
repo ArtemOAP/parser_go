@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -11,7 +12,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"io/ioutil"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -50,35 +50,10 @@ var ch chan int
 func main() {
 
 	parser := getInstance()
-
-	//parser.temp_files_src["key1"] = "val1"
-	//parser.links = append(parser.links, "fgfgfgfgfg", "fggfdgfdg", "fgfgfgfgfg", "fggfdgfdg", "fggfdgfdg")
-	parser.setTempName("sdfsdfsdf")
-	res := urlAbsolute("//fff.sdsds/sdsd/sdsdd", "https://diavita.com/page1/?q=1&w=765")
-	fmt.Println(res)
-	message("sdsdsd", "ffffff", "rrrrr")
-	res = parser.filterFileName("//imeg.jpg?dfdf=1&f=434")
-	fmt.Println(res)
-	//parser.parsePage("https://toster.ru/q/431978")
+	parser.setTempName("test")
 	parser.baseLink = "https://toster.ru/q/431978"
 
-	//parser.run()
-	e := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	ch := make(chan int)
-	st()
-	go ex()
-	for _, v := range e {
-		ch <- v
-
-	}
-}
-func ex() {
-	d := <-ch
-	fmt.Println(d)
-}
-
-func st() {
-
+	parser.run()
 }
 
 func (p *parserOnePage) run() *parserOnePage {
@@ -100,18 +75,35 @@ func (p *parserOnePage) parsePage(link string) {
 		log.Fatal(err)
 	}
 	doc, err := goquery.NewDocumentFromResponse(res)
+	if err != nil {
+		log.Fatal(err)
+	}
 	p.thenBaseHref(doc)
 	p.saveIco(doc)
 	p.saveModifyElemHref(doc)
 	p.saveModifyIframe(doc)
 	p.saveModifyJs(doc)
 	p.saveModifayCss(doc)
+	
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	/**
+		$this->saveCurlFile($this->multiCurl($this->temp_files_src),'src');
+        $temp_array = $this->saveModifyImg($page);
+        $this->saveCurlFile($this->multiCurl($temp_array),'img');
+        $this->modifyForm($page);
+        $patch=$this->_root_dir.'/'.$this->temp_name . '/' . $this->indFile;
+        $page->save($patch);
+        $this->replaceCssInHtml($patch);
+        $this->add($page,'<script type="text/javascript" src="/js/script.js"></script>');
+	**/
+
+
 
 	p.save(doc, ".")
+	message("pages url=",p.baseLink)
+	message("OK All create")
+
+
 }
 
 func (p *parserOnePage) thenBaseHref(doc *goquery.Document) {
@@ -166,20 +158,20 @@ func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 				if _, err := os.Stat(p.dirs["js"] + name); os.IsNotExist(err) {
 
 					link := urlAbsolute(src, p.baseLink)
-					_,response:= p.request(link)
-					if response != nil{
+					_, response := p.request(link)
+					if response != nil {
 						out, err := os.Create(p.dirs["js"] + name)
 						defer out.Close()
 						if err == nil {
 							io.Copy(out, response.Body)
 						}
 					}
-					
-						}
 
-					}
+				}
 
-				}	
+			}
+
+		}
 	})
 
 }
@@ -192,65 +184,22 @@ func (p *parserOnePage) request(url string) (error, *http.Response) {
 		//TODO log
 		return err, nil
 	}
-		req.Header.Set("Accept-language", "en")
-		req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-		if len(p.tempCookies) > 0 {
-			for _, c := range p.tempCookies {
-				req.AddCookie(c)
-			}
+	req.Header.Set("Accept-language", "en")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+	if len(p.tempCookies) > 0 {
+		for _, c := range p.tempCookies {
+			req.AddCookie(c)
 		}
-		resp, err := client.Do(req)
-		defer resp.Body.Close()
-		if err != nil || resp.StatusCode == 200 {
-			//TODO log
-			return err, nil
-		}
-		p.tempCookies = resp.Cookies()
-		return nil, resp
+	}
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+	if err != nil || resp.StatusCode == 200 {
+		//TODO log
+		return err, nil
+	}
+	p.tempCookies = resp.Cookies()
+	return nil, resp
 }
-
-/**
-
- public function saveModifayCss($page)
-    {
-        foreach ($page->find('link[rel=stylesheet]') as $key => $css) {
-
-            if (preg_match('/^https:\/\/fonts.googleapis.com/', $css->href) ||
-                preg_match('/^http:\/\/ajax.googleapis.com/', $css->href)
-            ) {
-                // пропускаем <link href="https://fonts.googleapis.com/css?family=Prompt:400,400i,700&amp;subset=thai,vietnamese" rel="stylesheet"/>
-                continue;
-            }
-            $name = $this->filterfileName($css->href);
-
-            if ($css->href) {
-                $linkCss    = $this->uri2absolute($css->href, $this->baseLink);
-                $linkDirCss = substr($linkCss, 0, strrpos($linkCss, '/') + 1);
-
-                $result_replace_url = preg_replace_callback('/url\((.*?)\)/',
-                    function ($matches) use ($linkDirCss) {
-                        return 'url(' . $this->getfile($matches[1], $linkDirCss) . ' )';
-                    }
-                    , $this->getContentFile($css->href));
-
-                $result_replace_import = preg_replace_callback('/@import "(.*?)"/',
-                    function ($matches) use ($linkDirCss) {
-                        return '@import "' . $this->getfile($matches[1], $linkDirCss) . '"';
-                    }, $result_replace_url);
-
-                if (!file_exists($this->dirs['css'] . $name) && $this->getContentFile($css->href)) {
-                    $this->message('➤ find css :', $name);
-                    file_put_contents($this->dirs['css'] . $name, $result_replace_import);
-                }
-
-                if ($css->href) {
-                    $css->href = $this->dirs['css_r'] . $name;
-
-                }
-            }
-        };
-    }
-**/
 
 func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 
@@ -263,28 +212,57 @@ func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 		href, _ := s.Attr("href")
 		if href != "" && !reg1.MatchString(href) && !reg2.MatchString(href) {
 
-			_,response:= p.request(href)
-			if response != nil{
-				
-				bodyb,_ := ioutil.ReadAll(response.Body)
+			_, response := p.request(href)
+			if response != nil {
 
+				bodyb, _ := ioutil.ReadAll(response.Body)
 				name := p.filterFileName(href)
-				linkDirCss := substrFind(href, '/')
-				result_replace_url:= reg3.ReplaceAllStringFunc(string(bodyb),func(str string)string{
-					return "url(" +p.getfileSrc(str,linkDirCss,false) + ")"
+
+				linkCss := urlAbsolute(href, p.baseLink)
+				linkDirCss := substrFind(linkCss, '/')
+				result_replace_url := reg3.ReplaceAllStringFunc(string(bodyb), func(str string) string {
+					return "url(" + p.getfileSrc(str, linkDirCss, false) + ")"
 				})
-				result_replace_import:= reg4.ReplaceAllStringFunc(result_replace_url,func(str string)string{
-					return "url(" +p.getfileSrc(str,linkDirCss,false) + ")"
+				result_replace_import := reg4.ReplaceAllStringFunc(result_replace_url, func(str string) string {
+					return "url(" + p.getfileSrc(str, linkDirCss, false) + ")"
 				})
 
+				if _, err := os.Stat(p.dirs["css"] + name); os.IsNotExist(err) {
+					message("➤ find css :", name)
+					WriteStringToFile(p.dirs["css"]+name, result_replace_import)
+				}
 
-				
+				s.SetAttr("href", p.dirs["css_r"]+name)
+			} else {
+				s.SetAttr("href", " ")
 			}
+
 		}
 
 	})
 
 }
+
+//saveModifyImg
+/**
+public function saveModifyImg($page)
+    {
+        $temp_array = [];
+        foreach ($page->find('img') as $key => $img) {
+            $name = $this->filterfileName($img->src);
+            if (!file_exists($this->dirs['img'] . $name) && @exif_imagetype(preg_replace("/ /","%20",$goodLinks = $this->uri2absolute($img->src, $this->baseLink)))) {
+                $this->message('find images :', $name);
+                if (array_key_exists($name, $temp_array)) {
+                    $name = 'img-' . $name;
+                }
+                $temp_array[$name] = preg_replace("/ /","%20",$goodLinks);
+            }
+            $img->src = $this->dirs['img_r'] . $name;
+        };
+
+        return $temp_array;
+    }
+**/
 
 func (p *parserOnePage) getfileSrc(link string, url string, at_html bool) string {
 
@@ -332,7 +310,6 @@ func (p *parserOnePage) saveFile(url string, patch string, name string) {
 	res, err := http.Get(url)
 
 	if err == nil && res.StatusCode == 200 {
-		fmt.Println(p.dir)
 		defer res.Body.Close()
 		out, err := os.Create(patch + name)
 		defer out.Close()
@@ -584,4 +561,19 @@ func substrFind(str string, s rune) string {
 
 func MD5(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
+}
+
+func WriteStringToFile(filepath, s string) error {
+	fo, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer fo.Close()
+
+	_, err = io.Copy(fo, strings.NewReader(s))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
