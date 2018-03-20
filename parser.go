@@ -84,25 +84,29 @@ func (p *parserOnePage) parsePage(link string) {
 	p.saveModifyIframe(doc)
 	p.saveModifyJs(doc)
 	p.saveModifayCss(doc)
-	
+	temp_array := p.saveModifyImg(doc)
+	println(len(temp_array))
+
+	for name, url := range temp_array {
+		p.saveFile(url, p.dirs["img"], name)
+	}
+
+	//TODO save image temp_array map
 
 	/**
-		$this->saveCurlFile($this->multiCurl($this->temp_files_src),'src');
-        $temp_array = $this->saveModifyImg($page);
-        $this->saveCurlFile($this->multiCurl($temp_array),'img');
-        $this->modifyForm($page);
-        $patch=$this->_root_dir.'/'.$this->temp_name . '/' . $this->indFile;
-        $page->save($patch);
-        $this->replaceCssInHtml($patch);
-        $this->add($page,'<script type="text/javascript" src="/js/script.js"></script>');
-	**/
-
-
+			$this->saveCurlFile($this->multiCurl($this->temp_files_src),'src');
+	        $temp_array = $this->saveModifyImg($page);
+	        $this->saveCurlFile($this->multiCurl($temp_array),'img');
+	        $this->modifyForm($page);
+	        $patch=$this->_root_dir.'/'.$this->temp_name . '/' . $this->indFile;
+	        $page->save($patch);
+	        $this->replaceCssInHtml($patch);
+	        $this->add($page,'<script type="text/javascript" src="/js/script.js"></script>');
+		**/
 
 	p.save(doc, ".")
-	message("pages url=",p.baseLink)
+	message("pages url=", p.baseLink)
 	message("OK All create")
-
 
 }
 
@@ -243,26 +247,24 @@ func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 
 }
 
-//saveModifyImg
-/**
-public function saveModifyImg($page)
-    {
-        $temp_array = [];
-        foreach ($page->find('img') as $key => $img) {
-            $name = $this->filterfileName($img->src);
-            if (!file_exists($this->dirs['img'] . $name) && @exif_imagetype(preg_replace("/ /","%20",$goodLinks = $this->uri2absolute($img->src, $this->baseLink)))) {
-                $this->message('find images :', $name);
-                if (array_key_exists($name, $temp_array)) {
-                    $name = 'img-' . $name;
-                }
-                $temp_array[$name] = preg_replace("/ /","%20",$goodLinks);
-            }
-            $img->src = $this->dirs['img_r'] . $name;
-        };
+func (p *parserOnePage) saveModifyImg(doc *goquery.Document) map[string]string {
+	temp_array := make(map[string]string)
+	name := ""
+	doc.Find("img").Each(func(i int, s *goquery.Selection) {
+		link, _ := s.Attr("src")
+		name = p.filterFileName(link)
+		if _, err := os.Stat(p.dirs["img"] + name); os.IsNotExist(err) {
+			message("find images :", name)
+			if temp_array[name] == "" {
+				name = "img-" + name
+			}
+			temp_array[name] = urlAbsolute(link, p.baseLink)
+			s.SetAttr("href", p.dirs["img_r"] + name)
+		}
 
-        return $temp_array;
-    }
-**/
+	})
+	return temp_array
+}
 
 func (p *parserOnePage) getfileSrc(link string, url string, at_html bool) string {
 
@@ -308,6 +310,20 @@ func (p *parserOnePage) srcFilter(link string) (string, string) {
 
 func (p *parserOnePage) saveFile(url string, patch string, name string) {
 	res, err := http.Get(url)
+
+	if err == nil && res.StatusCode == 200 {
+		defer res.Body.Close()
+		out, err := os.Create(patch + name)
+		defer out.Close()
+		if err == nil {
+			io.Copy(out, res.Body)
+		}
+	}
+}
+
+func (p *parserOnePage) saveFileGo(url string, patch string, name string) {
+	err, res := p.request(url)
+	println(res.StatusCode)
 
 	if err == nil && res.StatusCode == 200 {
 		defer res.Body.Close()
