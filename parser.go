@@ -88,7 +88,8 @@ func (p *parserOnePage) parsePage(link string) {
 	println(len(temp_array))
 
 	for name, url := range temp_array {
-		p.saveFile(url, p.dirs["img"], name)
+		fmt.Println(name,url)
+	 	p.saveFile(url, p.dirs["img"], name)
 	}
 
 	//TODO save image temp_array map
@@ -240,7 +241,6 @@ func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 			} else {
 				s.SetAttr("href", " ")
 			}
-
 		}
 
 	})
@@ -259,7 +259,7 @@ func (p *parserOnePage) saveModifyImg(doc *goquery.Document) map[string]string {
 				name = "img-" + name
 			}
 			temp_array[name] = urlAbsolute(link, p.baseLink)
-			s.SetAttr("href", p.dirs["img_r"] + name)
+			s.SetAttr("href", p.dirs["img_r"]+name)
 		}
 
 	})
@@ -464,8 +464,6 @@ func getInstance() *parserOnePage {
 }
 
 func urlAbsolute(link string, baseLink string) string {
-	message("links = ", link)
-	message("base = ", baseLink)
 
 	reg1, _ := regexp.Compile("^htt(p|ps)://")
 	reg2, _ := regexp.Compile("^//")
