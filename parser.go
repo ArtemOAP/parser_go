@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"time"
 )
 
 const DIR_SITE = "sites/"
@@ -24,6 +25,7 @@ type parserOnePage struct {
 	tempCookies    []*http.Cookie
 	tempName       string
 	temp_files_src map[string]string
+	temp_files     map[string]string
 	rootDir        string
 	baseLink       string
 	hrefAllLinks   string
@@ -43,9 +45,19 @@ type parserOnePage struct {
 	dir            string
 }
 
+const (
+	TypeImage = iota
+	TypeSrc
+)
+
 var instance *parserOnePage
 
 var ch chan int
+
+var chName chan string
+var chUrl chan string
+var chTypeImages chan  bool
+var chTypeSrc chan  bool
 
 func main() {
 
@@ -53,7 +65,55 @@ func main() {
 	parser.setTempName("test")
 	parser.baseLink = "https://toster.ru/q/431978"
 
+	fmt.Println("start")
+	ch= make(chan int)
+	//chName= make(chan string)
+	//chUrl= make(chan string)
+
+	chName = make(chan string)
+	chUrl = make(chan string)
+	//chUrlName
+
 	parser.run()
+
+	//go test()
+	//go test()
+	//for  i:=1; i<10 ;i++{
+	//	ch<-i
+	//
+	//	//fmt.Println(<-ch)
+	//}
+	////fmt.Println(<-ch)
+	//fmt.Println("end")
+
+}
+
+func test( )  {
+	var i int
+for{
+	i = <-ch
+
+	if i == 3{
+		time.Sleep(10000 * time.Millisecond)
+	}
+
+	ch <- 10 + i
+
+
+	if i < 1{
+		//ch<- 100
+		break
+
+
+	}
+}
+
+		// ch <- 10 + i
+		//if i < 1{
+		//	break
+		//}
+
+
 }
 
 func (p *parserOnePage) run() *parserOnePage {
@@ -70,6 +130,7 @@ func (p *parserOnePage) run() *parserOnePage {
 	return p
 }
 func (p *parserOnePage) parsePage(link string) {
+
 	res, err := http.Get(link)
 	if err != nil {
 		log.Fatal(err)
@@ -78,19 +139,34 @@ func (p *parserOnePage) parsePage(link string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	p.thenBaseHref(doc)
 	p.saveIco(doc)
 	p.saveModifyElemHref(doc)
 	p.saveModifyIframe(doc)
 	p.saveModifyJs(doc)
 	p.saveModifayCss(doc)
-	temp_array := p.saveModifyImg(doc)
-	println(len(temp_array))
+	p.saveModifyImg(doc)
 
-	for name, url := range temp_array {
-		fmt.Println(name,url)
-	 	p.saveFile(url, p.dirs["img"], name)
+
+	name,url:= "",""
+	for i:= 1 ;i<5 ;i++{
+		go p.multiFiles(name,url)
 	}
+	fmt.Println("multi")
+	for name, url := range p.temp_files {
+		chTypeImages <- true
+		chName <- name
+		chUrl <- url
+	}
+	chName <- ""
+	chUrl <- ""
+
+	fmt.Println(<-ch)
+
+
+
+
 
 	//TODO save image temp_array map
 
@@ -108,6 +184,32 @@ func (p *parserOnePage) parsePage(link string) {
 	p.save(doc, ".")
 	message("pages url=", p.baseLink)
 	message("OK All create")
+
+}
+func (p *parserOnePage)  multiFiles(name string,url string){
+
+	for{
+
+		select {
+		case  <-chTypeImages:
+
+			name = <-chName
+			url = <-chUrl
+			if name == "" && url == ""{
+				ch<-10
+				break
+			}
+			p.saveFileGo(url, p.dirs["img"], name)
+
+		case <-chTypeSrc:
+
+
+
+		}
+
+
+
+	}
 
 }
 
@@ -164,11 +266,13 @@ func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 
 					link := urlAbsolute(src, p.baseLink)
 					_, response := p.request(link)
+					defer response.Body.Close()
 					if response != nil {
 						out, err := os.Create(p.dirs["js"] + name)
 						defer out.Close()
 						if err == nil {
 							io.Copy(out, response.Body)
+
 						}
 					}
 
@@ -197,8 +301,8 @@ func (p *parserOnePage) request(url string) (error, *http.Response) {
 		}
 	}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
-	if err != nil || resp.StatusCode == 200 {
+
+	if err != nil || resp.StatusCode != 200 {
 		//TODO log
 		return err, nil
 	}
@@ -221,6 +325,7 @@ func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 			if response != nil {
 
 				bodyb, _ := ioutil.ReadAll(response.Body)
+				response.Body.Close()
 				name := p.filterFileName(href)
 
 				linkCss := urlAbsolute(href, p.baseLink)
@@ -248,22 +353,22 @@ func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 }
 
 func (p *parserOnePage) saveModifyImg(doc *goquery.Document) map[string]string {
-	temp_array := make(map[string]string)
 	name := ""
 	doc.Find("img").Each(func(i int, s *goquery.Selection) {
 		link, _ := s.Attr("src")
 		name = p.filterFileName(link)
 		if _, err := os.Stat(p.dirs["img"] + name); os.IsNotExist(err) {
 			message("find images :", name)
-			if temp_array[name] == "" {
+			if p.temp_files[name] == "" {
 				name = "img-" + name
 			}
-			temp_array[name] = urlAbsolute(link, p.baseLink)
-			s.SetAttr("href", p.dirs["img_r"]+name)
+			p.temp_files[name] = urlAbsolute(link, p.baseLink)
+
 		}
+		s.SetAttr("src", p.dirs["img_r"]+name)
 
 	})
-	return temp_array
+	return p.temp_files
 }
 
 func (p *parserOnePage) getfileSrc(link string, url string, at_html bool) string {
@@ -323,10 +428,8 @@ func (p *parserOnePage) saveFile(url string, patch string, name string) {
 
 func (p *parserOnePage) saveFileGo(url string, patch string, name string) {
 	err, res := p.request(url)
-	println(res.StatusCode)
-
+	defer res.Body.Close()
 	if err == nil && res.StatusCode == 200 {
-		defer res.Body.Close()
 		out, err := os.Create(patch + name)
 		defer out.Close()
 		if err == nil {
@@ -445,6 +548,7 @@ func getInstance() *parserOnePage {
 			timeSleep:      10,
 			gol:            2,
 			temp_files_src: make(map[string]string),
+			temp_files: make(map[string]string),
 			rootDir:        ".",
 			hrefAllLinks:   "#",
 			mobAgent:       "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
