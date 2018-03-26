@@ -60,29 +60,31 @@ var chTypeImages chan bool
 var chTypeSrc chan bool
 
 type Config struct {
-	// parser struct {
-	// 	timeSleep    int64  `default:10`
-	// 	gol          uint   `default:"2"`
-	// 	rootDir      string `default:"."`
-	// 	hrefAllLinks string `default:"#"`
-	// 	mobAgent     string `default:"Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"`
-	// 	descAgent    string `default:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"`
-	// 	links        []string
-	// 	countLink    int
-	// 	index        string `default:"index.php"`
-	// 	script       string
-	// 	notIframe    bool `default:"true"`
-	// 	ajax         bool `default:"false"`
-	// }
-	test string
+
+	 Parser struct {
+	 	TimeSleep    int64 `yaml:"timeSleep"`
+	 	Gol          uint
+	 	RootDir      string `yaml:"rootDir"`
+	 	HrefAllLinks string `yaml:"hrefAllLinks"`
+	 	MobAgent     string `yaml:"mobAgent"`
+	 	DescAgent    string `yaml:"descAgent"`
+	 	Links        []string
+	 	CountLink    int `yaml:"countLink"`
+	 	Index        string
+	 	Script       string
+	 	NotIframe    bool `yaml:"notIframe"`
+	 	Ajax         bool
+	 }
+
 }
 
 func main() {
 	var conf Config
-	source, err := ioutil.ReadFile("config.yml")
+	source, err := ioutil.ReadFile("./config.yml")
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(string(source))
 	errY := yaml.Unmarshal(source, &conf)
 	if errY != nil {
 		log.Fatalf("error: %v", err)
@@ -90,7 +92,7 @@ func main() {
 
 	fmt.Printf("--- config:\n%v\n\n", conf)
 
-	fmt.Println(conf.test)
+	fmt.Println(conf.Parser.Links)
 
 	// parser := getInstance()
 	// parser.setTempName("test")
