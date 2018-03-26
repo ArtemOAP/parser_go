@@ -13,9 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	"time"
-
 	"github.com/PuerkitoBio/goquery"
+	"gopkg.in/yaml.v2"
 )
 
 const DIR_SITE = "sites/"
@@ -60,55 +59,49 @@ var chUrl chan string
 var chTypeImages chan bool
 var chTypeSrc chan bool
 
-func main() {
-
-	parser := getInstance()
-	parser.setTempName("test")
-	parser.baseLink = "https://toster.ru/q/431978"
-
-	fmt.Println("start")
-	ch = make(chan int)
-	chName = make(chan string)
-	chUrl = make(chan string)
-	chTypeImages = make(chan bool)
-	chTypeSrc = make(chan bool)
-	parser.run()
-
-	//go test()
-	//go test()
-	//for  i:=1; i<10 ;i++{
-	//	ch<-i
-	//
-	//	//fmt.Println(<-ch)
-	//}
-	////fmt.Println(<-ch)
-	//fmt.Println("end")
-
+type Config struct {
+	// parser struct {
+	// 	timeSleep    int64  `default:10`
+	// 	gol          uint   `default:"2"`
+	// 	rootDir      string `default:"."`
+	// 	hrefAllLinks string `default:"#"`
+	// 	mobAgent     string `default:"Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"`
+	// 	descAgent    string `default:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"`
+	// 	links        []string
+	// 	countLink    int
+	// 	index        string `default:"index.php"`
+	// 	script       string
+	// 	notIframe    bool `default:"true"`
+	// 	ajax         bool `default:"false"`
+	// }
+	test string
 }
 
-func test() {
-	var i int
-	for {
-		i = <-ch
-
-		if i == 3 {
-			time.Sleep(10000 * time.Millisecond)
-		}
-
-		ch <- 10 + i
-
-		if i < 1 {
-			//ch<- 100
-			break
-
-		}
+func main() {
+	var conf Config
+	source, err := ioutil.ReadFile("config.yml")
+	if err != nil {
+		panic(err)
+	}
+	errY := yaml.Unmarshal(source, &conf)
+	if errY != nil {
+		log.Fatalf("error: %v", err)
 	}
 
-	// ch <- 10 + i
-	//if i < 1{
-	//	break
-	//}
+	fmt.Printf("--- config:\n%v\n\n", conf)
 
+	fmt.Println(conf.test)
+
+	// parser := getInstance()
+	// parser.setTempName("test")
+	// parser.baseLink = "https://toster.ru/q/431978"
+	// fmt.Println("start")
+	// ch = make(chan int)
+	// chName = make(chan string)
+	// chUrl = make(chan string)
+	// chTypeImages = make(chan bool)
+	// chTypeSrc = make(chan bool)
+	// parser.run()
 }
 
 func (p *parserOnePage) run() *parserOnePage {
@@ -166,12 +159,7 @@ func (p *parserOnePage) parsePage(link string) {
 
 	fmt.Println(<-ch)
 
-	//TODO save image temp_array map
-
 	/**
-			$this->saveCurlFile($this->multiCurl($this->temp_files_src),'src');
-	        $temp_array = $this->saveModifyImg($page);
-	        $this->saveCurlFile($this->multiCurl($temp_array),'img');
 	        $this->modifyForm($page);
 	        $patch=$this->_root_dir.'/'.$this->temp_name . '/' . $this->indFile;
 	        $page->save($patch);
