@@ -13,8 +13,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 const DIR_SITE = "sites/"
@@ -56,8 +57,8 @@ var ch chan int
 
 var chName chan string
 var chUrl chan string
-var chTypeImages chan  bool
-var chTypeSrc chan  bool
+var chTypeImages chan bool
+var chTypeSrc chan bool
 
 func main() {
 
@@ -66,14 +67,11 @@ func main() {
 	parser.baseLink = "https://toster.ru/q/431978"
 
 	fmt.Println("start")
-	ch= make(chan int)
-	//chName= make(chan string)
-	//chUrl= make(chan string)
-
+	ch = make(chan int)
 	chName = make(chan string)
 	chUrl = make(chan string)
-	//chUrlName
-
+	chTypeImages = make(chan bool)
+	chTypeSrc = make(chan bool)
 	parser.run()
 
 	//go test()
@@ -88,31 +86,28 @@ func main() {
 
 }
 
-func test( )  {
+func test() {
 	var i int
-for{
-	i = <-ch
+	for {
+		i = <-ch
 
-	if i == 3{
-		time.Sleep(10000 * time.Millisecond)
+		if i == 3 {
+			time.Sleep(10000 * time.Millisecond)
+		}
+
+		ch <- 10 + i
+
+		if i < 1 {
+			//ch<- 100
+			break
+
+		}
 	}
 
-	ch <- 10 + i
-
-
-	if i < 1{
-		//ch<- 100
-		break
-
-
-	}
-}
-
-		// ch <- 10 + i
-		//if i < 1{
-		//	break
-		//}
-
+	// ch <- 10 + i
+	//if i < 1{
+	//	break
+	//}
 
 }
 
@@ -148,25 +143,28 @@ func (p *parserOnePage) parsePage(link string) {
 	p.saveModifayCss(doc)
 	p.saveModifyImg(doc)
 
-
-	name,url:= "",""
-	for i:= 1 ;i<5 ;i++{
-		go p.multiFiles(name,url)
+	name, url := "", ""
+	for i := 1; i < 5; i++ {
+		go p.multiFiles(name, url)
 	}
 	fmt.Println("multi")
 	for name, url := range p.temp_files {
-		chTypeImages <- true
 		chName <- name
 		chUrl <- url
+		chTypeImages <- true
+	}
+
+	name, url = "", ""
+	fmt.Println("multi")
+	for name, url := range p.temp_files_src {
+		chName <- name
+		chUrl <- url
+		chTypeSrc <- true
 	}
 	chName <- ""
 	chUrl <- ""
 
 	fmt.Println(<-ch)
-
-
-
-
 
 	//TODO save image temp_array map
 
@@ -186,28 +184,22 @@ func (p *parserOnePage) parsePage(link string) {
 	message("OK All create")
 
 }
-func (p *parserOnePage)  multiFiles(name string,url string){
+func (p *parserOnePage) multiFiles(name string, url string) {
 
-	for{
+	for {
 
-		select {
-		case  <-chTypeImages:
-
-			name = <-chName
-			url = <-chUrl
-			if name == "" && url == ""{
-				ch<-10
-				break
-			}
-			p.saveFileGo(url, p.dirs["img"], name)
-
-		case <-chTypeSrc:
-
-
-
+		name = <-chName
+		url = <-chUrl
+		if name == "" && url == "" {
+			ch <- 10
+			break
 		}
-
-
+		select {
+		case <-chTypeImages:
+			p.saveFileGo(url, p.dirs["img"], name)
+		case <-chTypeSrc:
+			p.saveFileGo(url, p.dirs["src"], name)
+		}
 
 	}
 
@@ -548,7 +540,7 @@ func getInstance() *parserOnePage {
 			timeSleep:      10,
 			gol:            2,
 			temp_files_src: make(map[string]string),
-			temp_files: make(map[string]string),
+			temp_files:     make(map[string]string),
 			rootDir:        ".",
 			hrefAllLinks:   "#",
 			mobAgent:       "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
