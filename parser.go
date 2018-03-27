@@ -12,9 +12,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
 	"github.com/PuerkitoBio/goquery"
-	"gopkg.in/yaml.v2"
+	"parser_go/config"
 )
 
 const DIR_SITE = "sites/"
@@ -59,40 +58,11 @@ var chUrl chan string
 var chTypeImages chan bool
 var chTypeSrc chan bool
 
-type Config struct {
 
-	 Parser struct {
-	 	TimeSleep    int64 `yaml:"timeSleep"`
-	 	Gol          uint
-	 	RootDir      string `yaml:"rootDir"`
-	 	HrefAllLinks string `yaml:"hrefAllLinks"`
-	 	MobAgent     string `yaml:"mobAgent"`
-	 	DescAgent    string `yaml:"descAgent"`
-	 	Links        []string
-	 	CountLink    int `yaml:"countLink"`
-	 	Index        string
-	 	Script       string
-	 	NotIframe    bool `yaml:"notIframe"`
-	 	Ajax         bool
-	 }
-
-}
 
 func main() {
-	var conf Config
-	source, err := ioutil.ReadFile("./config.yml")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(source))
-	errY := yaml.Unmarshal(source, &conf)
-	if errY != nil {
-		log.Fatalf("error: %v", err)
-	}
-
-	fmt.Printf("--- config:\n%v\n\n", conf)
-
-	fmt.Println(conf.Parser.Links)
+	config.GetConfig()
+	
 
 	// parser := getInstance()
 	// parser.setTempName("test")
