@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -235,18 +236,38 @@ func (p *parserOnePage) request(url string) (error, *http.Response) {
 	}
 	req.Header.Set("Accept-language", "en")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+	//add
+	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	req.Header.Set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+	req.Header.Set("Cache-Control", "no-cache")
+	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("User-Agent", p.userAgent)
+
+	//TODO cookies
+	//fmt.Println(p.tempCookies)
+
 	if len(p.tempCookies) > 0 {
 		for _, c := range p.tempCookies {
-			req.AddCookie(c)
+
+			if c != nil {
+				req.AddCookie(c)
+			}
+
 		}
 	}
 	resp, err := client.Do(req)
 
-	if err != nil && (err == nil && resp.StatusCode != 200) {
+	if err != nil {
 		//TODO log
 		return err, nil
 	}
-	p.tempCookies = resp.Cookies()
+	if resp.StatusCode != 200 {
+		return errors.New("Resp code = " + strconv.Itoa(resp.StatusCode)), nil
+	}
+	if(resp != nil ){
+		p.tempCookies = resp.Cookies()
+	}
+	
 	return nil, resp
 }
 
@@ -368,7 +389,9 @@ func (p *parserOnePage) saveFile(url string, patch string, name string) {
 
 func (p *parserOnePage) saveFileGo(url string, patch string, name string) {
 	err, res := p.request(url)
-	defer res.Body.Close()
+	if(err == nil){
+		defer res.Body.Close()
+	}
 	if err == nil && res.StatusCode == 200 {
 		out, err := os.Create(patch + name)
 		defer out.Close()
