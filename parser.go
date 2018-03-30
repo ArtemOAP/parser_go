@@ -59,7 +59,6 @@ var chTypeSrc chan bool
 func main() {
 	parser := getInstance(config.GetConfig())
 	fmt.Println("start")
-	fmt.Println(parser.links)
 	parser.run()
 }
 
@@ -96,20 +95,18 @@ func (p *parserOnePage) parsePage(link string) {
 	p.saveModifyJs(doc)
 	p.saveModifayCss(doc)
 	p.saveModifyImg(doc)
+	p.modifyForm(doc)
+
 
 	name, url := "", ""
 	for i := 1; i < 5; i++ {
 		go p.multiFiles(name, url)
 	}
-	fmt.Println("multi")
 	for name, url := range p.temp_files {
 		chName <- name
 		chUrl <- url
 		chTypeImages <- true
 	}
-
-	name, url = "", ""
-	fmt.Println("multi")
 	for name, url := range p.temp_files_src {
 		chName <- name
 		chUrl <- url
@@ -117,13 +114,10 @@ func (p *parserOnePage) parsePage(link string) {
 	}
 	chName <- ""
 	chUrl <- ""
-
 	fmt.Println(<-ch)
 
+
 	/**
-	        $this->modifyForm($page);
-	        $patch=$this->_root_dir.'/'.$this->temp_name . '/' . $this->indFile;
-	        $page->save($patch);
 	        $this->replaceCssInHtml($patch);
 	        $this->add($page,'<script type="text/javascript" src="/js/script.js"></script>');
 		**/
@@ -192,6 +186,42 @@ func (p *parserOnePage) saveModifyIframe(doc *goquery.Document) {
 		})
 	}
 }
+func (p *parserOnePage) modifyForm(doc *goquery.Document) {
+		doc.Find("form").Each(func(i int, s *goquery.Selection) {
+			s.SetAttr("action","javascript:void(0)")
+		})
+}
+
+/**
+protected function replaceCssInHtml($patch)
+    {
+        $html_all_page=file_get_contents($patch);
+        $result = preg_replace_callback('/url\((.*?)\)/',
+            function ($matches)  {
+                return 'url(' . $this->getfile($matches[1], $this->uri2absolute($matches[1],$this->baseLink),true) . ' )';
+            }
+            , $html_all_page);
+        file_put_contents($patch,$result);
+        $this->saveCurlFile($this->multiCurl($this->temp_files_src),'src');
+        unset($this->temp_files_src);
+        
+    }
+**/
+func (p *parserOnePage) replaceCssInHtml(patch string) {
+
+	source, err := ioutil.ReadFile(patch)
+	if err != nil {
+		//TODO 
+		//return;
+	}
+	//source
+
+//	err = ioutil.WriteFile(fi.Name(), []byte(Value), 0644)
+
+
+}
+
+
 
 func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 
@@ -207,8 +237,8 @@ func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 
 					link := p.urlAbsolute(src, p.baseLink)
 					_, response := p.request(link)
-					defer response.Body.Close()
 					if response != nil {
+						defer response.Body.Close()
 						out, err := os.Create(p.dirs["js"] + name)
 						defer out.Close()
 						if err == nil {
@@ -237,12 +267,10 @@ func (p *parserOnePage) request(url string) (error, *http.Response) {
 	req.Header.Set("Accept-language", "en")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 	//add
-	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	req.Header.Set("Accept-Encoding", "*")
 	req.Header.Set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
 	req.Header.Set("Cache-Control", "no-cache")
-	req.Header.Set("Connection", "keep-alive")
 	req.Header.Set("User-Agent", p.userAgent)
-
 	//TODO cookies
 	//fmt.Println(p.tempCookies)
 
@@ -264,10 +292,10 @@ func (p *parserOnePage) request(url string) (error, *http.Response) {
 	if resp.StatusCode != 200 {
 		return errors.New("Resp code = " + strconv.Itoa(resp.StatusCode)), nil
 	}
-	if(resp != nil ){
+	if resp != nil {
 		p.tempCookies = resp.Cookies()
 	}
-	
+
 	return nil, resp
 }
 
@@ -389,7 +417,7 @@ func (p *parserOnePage) saveFile(url string, patch string, name string) {
 
 func (p *parserOnePage) saveFileGo(url string, patch string, name string) {
 	err, res := p.request(url)
-	if(err == nil){
+	if err == nil {
 		defer res.Body.Close()
 	}
 	if err == nil && res.StatusCode == 200 {
