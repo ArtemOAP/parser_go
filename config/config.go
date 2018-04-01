@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -18,11 +17,13 @@ type Config struct {
 		DescAgent    string `yaml:"descAgent"`
 		Links        map[string]string
 		CountLink    int `yaml:"countLink"`
-		Index        string
+		IndexDesc        string  `yaml:"indexDesc"`
+		IndexMob        string  `yaml:"indexMob"`
 		Script       string
 		NotIframe    bool `yaml:"notIframe"`
 		Ajax         bool
 		Dir          string
+		Mob          bool
 	}
 }
 
@@ -36,6 +37,6 @@ func GetConfig() *Config {
 	if errY != nil {
 		log.Fatalf("error: %v", err)
 	}
-	fmt.Printf("--- config:\n%v\n\n", conf)
+	//fmt.Printf("--- config:\n%v\n\n", conf)
 	return &conf
 }

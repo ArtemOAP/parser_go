@@ -10,11 +10,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"parser_go/config"
+	"./config"
 	"regexp"
 	"strconv"
 	"strings"
-
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -36,12 +35,14 @@ type parserOnePage struct {
 	countLink      int
 	dirs           map[string]string
 	indFile        string
-	index          string
+	indexDesc      string
+	indexMob	   string
 	script         string
 	notIframe      bool
 	baseTeg        string
 	ajax           bool
 	dir            string
+	mob 		   bool
 }
 
 const (
@@ -58,7 +59,7 @@ var chTypeSrc chan bool
 
 func main() {
 	parser := getInstance(config.GetConfig())
-	fmt.Println("start")
+	message("start")
 	parser.run()
 }
 
@@ -72,8 +73,13 @@ func (p *parserOnePage) run() *parserOnePage {
 	for name, link := range p.links {
 		p.baseLink = link
 		p.setTempName(name)
-		p.setOptions()
+		p.setOptions(false)
 		p.parsePage(link)
+
+		if p.mob{
+			p.setOptions(true)
+			p.parsePage(link)
+		}
 	}
 
 	return p
@@ -96,6 +102,8 @@ func (p *parserOnePage) parsePage(link string) {
 	p.saveModifayCss(doc)
 	p.saveModifyImg(doc)
 	p.modifyForm(doc)
+	p.save(doc, p.rootDir+"/"+p.tempName+"/"  + p.indFile)
+	p.replaceCssInHtml(p.rootDir+"/"+p.tempName+"/"+p.indFile)
 
 
 	name, url := "", ""
@@ -118,11 +126,11 @@ func (p *parserOnePage) parsePage(link string) {
 
 
 	/**
-	        $this->replaceCssInHtml($patch);
+
 	        $this->add($page,'<script type="text/javascript" src="/js/script.js"></script>');
 		**/
 
-	p.save(doc, p.rootDir+"/"+p.tempName+"/")
+
 	message("pages url=", p.baseLink)
 	message("OK All create")
 
@@ -149,7 +157,10 @@ func (p *parserOnePage) multiFiles(name string, url string) {
 }
 
 func (p *parserOnePage) thenBaseHref(doc *goquery.Document) {
-	doc.Find("base").Remove()
+	doc.Find("base").Each(func(i int, s *goquery.Selection) {
+		p.baseTeg, _ = s.Attr("href")
+	}).Remove()
+	//doc.Find("base").Remove()
 }
 
 func (p *parserOnePage) saveIco(doc *goquery.Document) {
@@ -192,32 +203,20 @@ func (p *parserOnePage) modifyForm(doc *goquery.Document) {
 		})
 }
 
-/**
-protected function replaceCssInHtml($patch)
-    {
-        $html_all_page=file_get_contents($patch);
-        $result = preg_replace_callback('/url\((.*?)\)/',
-            function ($matches)  {
-                return 'url(' . $this->getfile($matches[1], $this->uri2absolute($matches[1],$this->baseLink),true) . ' )';
-            }
-            , $html_all_page);
-        file_put_contents($patch,$result);
-        $this->saveCurlFile($this->multiCurl($this->temp_files_src),'src');
-        unset($this->temp_files_src);
-        
-    }
-**/
+//TODO test
 func (p *parserOnePage) replaceCssInHtml(patch string) {
 
 	source, err := ioutil.ReadFile(patch)
 	if err != nil {
 		//TODO 
-		//return;
+		log.Fatal(err)
 	}
+	result_replace_url := regexp.MustCompile(`/url\((.*?)\)/`).ReplaceAllStringFunc(string(source), func(str string) string {
+		return "url(" + p.getfileSrc(str, p.urlAbsolute(str,p.baseLink), true) + ")"
+	})
+
 	//source
-
-//	err = ioutil.WriteFile(fi.Name(), []byte(Value), 0644)
-
+	err = ioutil.WriteFile(patch, []byte(result_replace_url), 0644)
 
 }
 
@@ -308,9 +307,11 @@ func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 
 	doc.Find("link[rel=stylesheet]").Each(func(i int, s *goquery.Selection) {
 		href, _ := s.Attr("href")
+		message("find css :", href)
 		if href != "" && !reg1.MatchString(href) && !reg2.MatchString(href) {
 
-			_, response := p.request(href)
+
+			_, response := p.request(p.urlAbsolute(href,p.baseLink))
 			if response != nil {
 
 				bodyb, _ := ioutil.ReadAll(response.Body)
@@ -431,9 +432,9 @@ func (p *parserOnePage) saveFileGo(url string, patch string, name string) {
 
 func (p *parserOnePage) save(doc *goquery.Document, filePatch string) {
 
-	dir, _ := os.Getwd()
+	//dir, _ := os.Getwd()
 
-	file, err := os.Create(dir + "/" + p.tempName + "/" + p.indFile)
+	file, err := os.Create(filePatch)
 	if err != nil {
 		log.Fatal("Cannot create file", err)
 	}
@@ -497,10 +498,15 @@ func (p *parserOnePage) setHrefAllLinks(hrefAllLinks string) *parserOnePage {
 	return p
 }
 
-func (p *parserOnePage) setOptions() {
+func (p *parserOnePage) setOptions(isMob bool) {
 
-	if p.dirAgent == "" {
+	if isMob  {
+		p.setAgentMob(true)
+		p.indFile = p.indexMob
+	}
+	if !isMob  {
 		p.setAgentMob(false)
+		p.indFile = p.indexDesc
 	}
 	p.dirs["css"] = p.rootDir + "/" + p.tempName + "/" + p.dirAgent + "/css/"
 	p.dirs["css_r"] = p.dirAgent + "/css/"
@@ -510,17 +516,10 @@ func (p *parserOnePage) setOptions() {
 	p.dirs["img_r"] = p.dirAgent + "/images/"
 	p.dirs["src"] = p.rootDir + "/" + p.tempName + "/" + p.dirAgent + "/src/"
 	p.dirs["src_r"] = p.dirAgent + "/src/"
-
 	p.CreateDirIfNotExist(p.dirs["css"])
 	p.CreateDirIfNotExist(p.dirs["js"])
 	p.CreateDirIfNotExist(p.dirs["img"])
 	p.CreateDirIfNotExist(p.dirs["src"])
-
-	if p.dirAgent == "distr" {
-		p.indFile = "index.php"
-	} else {
-		p.indFile = "index2.php"
-	}
 }
 
 func (p *parserOnePage) CreateDirIfNotExist(dir string) {
@@ -547,11 +546,13 @@ func getInstance(conf *config.Config) *parserOnePage {
 			links:          conf.Parser.Links,
 			countLink:      conf.Parser.CountLink,
 			dirs:           make(map[string]string),
-			index:          conf.Parser.Index,
+			indexDesc:          conf.Parser.IndexDesc,
+			indexMob:            conf.Parser.IndexMob,
 			script:         conf.Parser.Script,
 			notIframe:      conf.Parser.NotIframe,
 			ajax:           conf.Parser.Ajax,
 			dir:            conf.Parser.Dir,
+			mob: 			conf.Parser.Mob,
 		}
 		ch = make(chan int)
 		chName = make(chan string)
@@ -573,9 +574,7 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 	if reg1.MatchString(link) && reg1.MatchString(baseLink) {
 		return link
 	}
-	if p.baseTeg != "" {
-		link = p.baseTeg + link
-	}
+
 	u, err := url.Parse(baseLink)
 	if err != nil {
 		log.Fatal(err)
@@ -583,12 +582,23 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 	if reg2.MatchString(link) {
 		return u.Scheme + ":" + link
 	}
+	if reg4.MatchString(link) && p.baseTeg != "" {
+		//fmt.Println(u.Scheme + "://" + u.Host  + link)
+		return u.Scheme + "://" + u.Host  + link
+	}
+
+	if p.baseTeg != "" {
+		link = p.baseTeg + link
+	}
 
 	if !reg3.MatchString(link) {
 		return ""
 	}
 	matchesLink := reg3.FindStringSubmatch(link)
 	matchesBaseLink := reg3.FindStringSubmatch(baseLink)
+
+
+
 
 	if matchesLink[1] != "" {
 		return link
@@ -608,6 +618,10 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 	}
 
 	patch := reg2.ReplaceAllString(matchesLink[3], "")
+	//if reg4.MatchString(patch){
+	//	return u.Scheme + "://" + u.Host + patch
+	//}
+
 	patches := strings.Split(patch, "/")
 
 	if patches[0] == "" {
@@ -617,9 +631,13 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 	patchBase := reg4.ReplaceAllString(matchesBaseLink[3], "")
 
 	patchesBase := strings.Split(patchBase, "/")
+
+
 	if count := len(patchesBase); count > 0 {
 		patchesBase = patchesBase[:count-1]
 	}
+
+
 
 	for _, p := range patches {
 
