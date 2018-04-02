@@ -10,10 +10,11 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"./config"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"./config"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -36,13 +37,14 @@ type parserOnePage struct {
 	dirs           map[string]string
 	indFile        string
 	indexDesc      string
-	indexMob	   string
+	indexMob       string
 	script         string
 	notIframe      bool
 	baseTeg        string
 	ajax           bool
 	dir            string
-	mob 		   bool
+	mob            bool
+	addHeader      []string
 }
 
 const (
@@ -76,7 +78,7 @@ func (p *parserOnePage) run() *parserOnePage {
 		p.setOptions(false)
 		p.parsePage(link)
 
-		if p.mob{
+		if p.mob {
 			p.setOptions(true)
 			p.parsePage(link)
 		}
@@ -102,9 +104,9 @@ func (p *parserOnePage) parsePage(link string) {
 	p.saveModifayCss(doc)
 	p.saveModifyImg(doc)
 	p.modifyForm(doc)
-	p.save(doc, p.rootDir+"/"+p.tempName+"/"  + p.indFile)
-	p.replaceCssInHtml(p.rootDir+"/"+p.tempName+"/"+p.indFile)
-
+	p.appEndHeader(doc)
+	p.save(doc, p.rootDir+"/"+p.tempName+"/"+p.indFile)
+	p.replaceCssInHtml(p.rootDir + "/" + p.tempName + "/" + p.indFile)
 
 	name, url := "", ""
 	for i := 1; i < 5; i++ {
@@ -123,13 +125,6 @@ func (p *parserOnePage) parsePage(link string) {
 	chName <- ""
 	chUrl <- ""
 	fmt.Println(<-ch)
-
-
-	/**
-
-	        $this->add($page,'<script type="text/javascript" src="/js/script.js"></script>');
-		**/
-
 
 	message("pages url=", p.baseLink)
 	message("OK All create")
@@ -154,6 +149,12 @@ func (p *parserOnePage) multiFiles(name string, url string) {
 
 	}
 
+}
+
+func (p *parserOnePage) appEndHeader(doc *goquery.Document) {
+	for _, val := range p.addHeader {
+		doc.Find("head").AppendHtml(val)
+	}
 }
 
 func (p *parserOnePage) thenBaseHref(doc *goquery.Document) {
@@ -198,9 +199,9 @@ func (p *parserOnePage) saveModifyIframe(doc *goquery.Document) {
 	}
 }
 func (p *parserOnePage) modifyForm(doc *goquery.Document) {
-		doc.Find("form").Each(func(i int, s *goquery.Selection) {
-			s.SetAttr("action","javascript:void(0)")
-		})
+	doc.Find("form").Each(func(i int, s *goquery.Selection) {
+		s.SetAttr("action", "javascript:void(0)")
+	})
 }
 
 //TODO test
@@ -208,19 +209,21 @@ func (p *parserOnePage) replaceCssInHtml(patch string) {
 
 	source, err := ioutil.ReadFile(patch)
 	if err != nil {
-		//TODO 
+		//TODO
 		log.Fatal(err)
 	}
 	result_replace_url := regexp.MustCompile(`/url\((.*?)\)/`).ReplaceAllStringFunc(string(source), func(str string) string {
-		return "url(" + p.getfileSrc(str, p.urlAbsolute(str,p.baseLink), true) + ")"
+		return "url(" + p.getfileSrc(str, p.urlAbsolute(str, p.baseLink), true) + ")"
 	})
 
 	//source
 	err = ioutil.WriteFile(patch, []byte(result_replace_url), 0644)
+	if err != nil {
+		//TODO
+		log.Fatal(err)
+	}
 
 }
-
-
 
 func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 
@@ -310,8 +313,7 @@ func (p *parserOnePage) saveModifayCss(doc *goquery.Document) {
 		message("find css :", href)
 		if href != "" && !reg1.MatchString(href) && !reg2.MatchString(href) {
 
-
-			_, response := p.request(p.urlAbsolute(href,p.baseLink))
+			_, response := p.request(p.urlAbsolute(href, p.baseLink))
 			if response != nil {
 
 				bodyb, _ := ioutil.ReadAll(response.Body)
@@ -500,11 +502,11 @@ func (p *parserOnePage) setHrefAllLinks(hrefAllLinks string) *parserOnePage {
 
 func (p *parserOnePage) setOptions(isMob bool) {
 
-	if isMob  {
+	if isMob {
 		p.setAgentMob(true)
 		p.indFile = p.indexMob
 	}
-	if !isMob  {
+	if !isMob {
 		p.setAgentMob(false)
 		p.indFile = p.indexDesc
 	}
@@ -546,13 +548,14 @@ func getInstance(conf *config.Config) *parserOnePage {
 			links:          conf.Parser.Links,
 			countLink:      conf.Parser.CountLink,
 			dirs:           make(map[string]string),
-			indexDesc:          conf.Parser.IndexDesc,
-			indexMob:            conf.Parser.IndexMob,
+			indexDesc:      conf.Parser.IndexDesc,
+			indexMob:       conf.Parser.IndexMob,
 			script:         conf.Parser.Script,
 			notIframe:      conf.Parser.NotIframe,
 			ajax:           conf.Parser.Ajax,
 			dir:            conf.Parser.Dir,
-			mob: 			conf.Parser.Mob,
+			mob:            conf.Parser.Mob,
+			addHeader:      conf.Parser.AddHeader,
 		}
 		ch = make(chan int)
 		chName = make(chan string)
@@ -584,7 +587,7 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 	}
 	if reg4.MatchString(link) && p.baseTeg != "" {
 		//fmt.Println(u.Scheme + "://" + u.Host  + link)
-		return u.Scheme + "://" + u.Host  + link
+		return u.Scheme + "://" + u.Host + link
 	}
 
 	if p.baseTeg != "" {
@@ -596,9 +599,6 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 	}
 	matchesLink := reg3.FindStringSubmatch(link)
 	matchesBaseLink := reg3.FindStringSubmatch(baseLink)
-
-
-
 
 	if matchesLink[1] != "" {
 		return link
@@ -632,12 +632,9 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 
 	patchesBase := strings.Split(patchBase, "/")
 
-
 	if count := len(patchesBase); count > 0 {
 		patchesBase = patchesBase[:count-1]
 	}
-
-
 
 	for _, p := range patches {
 

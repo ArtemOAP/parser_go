@@ -16,14 +16,15 @@ type Config struct {
 		MobAgent     string `yaml:"mobAgent"`
 		DescAgent    string `yaml:"descAgent"`
 		Links        map[string]string
-		CountLink    int `yaml:"countLink"`
-		IndexDesc        string  `yaml:"indexDesc"`
-		IndexMob        string  `yaml:"indexMob"`
+		CountLink    int    `yaml:"countLink"`
+		IndexDesc    string `yaml:"indexDesc"`
+		IndexMob     string `yaml:"indexMob"`
 		Script       string
 		NotIframe    bool `yaml:"notIframe"`
 		Ajax         bool
 		Dir          string
 		Mob          bool
+		AddHeader    []string `yaml:"addHeader"`
 	}
 }
 

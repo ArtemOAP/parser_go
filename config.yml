@@ -15,3 +15,5 @@ parser:
        ajax: false
        dir: "sites/"
        mob: false
+       addHeader:
+               -  '<script type="text/javascript" src="/js/script.js"></script>'
