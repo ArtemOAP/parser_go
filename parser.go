@@ -108,9 +108,8 @@ func (p *parserOnePage) parsePage(link string) {
 	p.save(doc, p.rootDir+"/"+p.tempName+"/"+p.indFile)
 	p.replaceCssInHtml(p.rootDir + "/" + p.tempName + "/" + p.indFile)
 
-	name, url := "", ""
 	for i := 1; i < 5; i++ {
-		go p.multiFiles(name, url)
+		go p.multiFiles()
 	}
 	for name, url := range p.temp_files {
 		chName <- name
@@ -122,21 +121,19 @@ func (p *parserOnePage) parsePage(link string) {
 		chUrl <- url
 		chTypeSrc <- true
 	}
-	chName <- ""
-	chUrl <- ""
+	close(chName)
+	close(chUrl)
 	fmt.Println(<-ch)
-
 	message("pages url=", p.baseLink)
 	message("OK All create")
 
 }
-func (p *parserOnePage) multiFiles(name string, url string) {
+func (p *parserOnePage) multiFiles() {
 
 	for {
-
-		name = <-chName
-		url = <-chUrl
-		if name == "" && url == "" {
+		name, okCh1 := <-chName
+		url, okCh2 := <-chUrl
+		if !okCh1 && !okCh2 {
 			ch <- 10
 			break
 		}
@@ -161,7 +158,6 @@ func (p *parserOnePage) thenBaseHref(doc *goquery.Document) {
 	doc.Find("base").Each(func(i int, s *goquery.Selection) {
 		p.baseTeg, _ = s.Attr("href")
 	}).Remove()
-	//doc.Find("base").Remove()
 }
 
 func (p *parserOnePage) saveIco(doc *goquery.Document) {

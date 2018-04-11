@@ -32,12 +32,11 @@ func GetConfig() *Config {
 	var conf Config
 	source, err := ioutil.ReadFile("./config.yml")
 	if err != nil {
-		panic(err)
+		log.Fatalf("File config not found!\n")
 	}
 	errY := yaml.Unmarshal(source, &conf)
 	if errY != nil {
-		log.Fatalf("error: %v", err)
+		log.Fatalf("File config no valid - error: %v", err)
 	}
-	//fmt.Printf("--- config:\n%v\n\n", conf)
 	return &conf
 }
