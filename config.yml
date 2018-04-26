@@ -17,3 +17,5 @@ parser:
        mob: false
        addHeader:
                -  '<script type="text/javascript" src="/js/script.js"></script>'
+       removeAllTag:
+               - script

@@ -25,6 +25,7 @@ type Config struct {
 		Dir          string
 		Mob          bool
 		AddHeader    []string `yaml:"addHeader"`
+		RemoveAllTag  []string `yaml:"removeAllTag"`
 	}
 }
 

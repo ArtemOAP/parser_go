@@ -45,6 +45,7 @@ type parserOnePage struct {
 	dir            string
 	mob            bool
 	addHeader      []string
+	RemoveAllTag   []string
 }
 
 const (
@@ -104,11 +105,12 @@ func (p *parserOnePage) parsePage(link string) {
 	p.saveModifayCss(doc)
 	p.saveModifyImg(doc)
 	p.modifyForm(doc)
+	p.runRemoveAllTag(doc)
 	p.appEndHeader(doc)
 	p.save(doc, p.rootDir+"/"+p.tempName+"/"+p.indFile)
 	p.replaceCssInHtml(p.rootDir + "/" + p.tempName + "/" + p.indFile)
 
-	for i := 1; i < 5; i++ {
+	for i := 1; i < 4; i++ {
 		go p.multiFiles()
 	}
 	for name, url := range p.temp_files {
@@ -151,6 +153,17 @@ func (p *parserOnePage) multiFiles() {
 func (p *parserOnePage) appEndHeader(doc *goquery.Document) {
 	for _, val := range p.addHeader {
 		doc.Find("head").AppendHtml(val)
+	}
+}
+
+func (p *parserOnePage) runRemoveAllTag(doc *goquery.Document) {
+	var el *goquery.Selection
+	for _, val := range p.RemoveAllTag {
+		if val != "" {
+			fmt.Println(doc.Find(val).Attr("src"))
+			el = doc.Find(val)
+			el.Remove()
+		}
 	}
 }
 
@@ -416,9 +429,10 @@ func (p *parserOnePage) saveFile(url string, patch string, name string) {
 
 func (p *parserOnePage) saveFileGo(url string, patch string, name string) {
 	err, res := p.request(url)
-	if err == nil {
-		defer res.Body.Close()
+	if err != nil {
+		message("Warning! not connect file url=" + url)
 	}
+	defer res.Body.Close()
 	if err == nil && res.StatusCode == 200 {
 		out, err := os.Create(patch + name)
 		defer out.Close()
@@ -552,6 +566,7 @@ func getInstance(conf *config.Config) *parserOnePage {
 			dir:            conf.Parser.Dir,
 			mob:            conf.Parser.Mob,
 			addHeader:      conf.Parser.AddHeader,
+			RemoveAllTag:   conf.Parser.RemoveAllTag,
 		}
 		ch = make(chan int)
 		chName = make(chan string)

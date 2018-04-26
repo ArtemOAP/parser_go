@@ -1,0 +1,1184 @@
+<!DOCTYPE html><html lang="ru"><head>
+
+	<meta charset="utf-8"/>
+	
+
+	<title>Gulp для самых маленьких - подробное руководство</title>
+	<meta name="description" content="Gulp - подробное руководство для начинающих. Рассмотрим использование Gulp для sass, gulp watch, установку gulp, минификацию CSS и работу с тасками (task)"/>
+	
+	<link rel="stylesheet" href="distr/css/main.min.css"/>
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+	<link rel="shortcut icon" href="img/favicon/favicon.ico" type="image/x-icon"/>
+	<link rel="apple-touch-icon" href="distr/images/apple-touch-icon.png"/>
+	<link rel="apple-touch-icon" sizes="72x72" href="distr/images/apple-touch-icon-72x72.png"/>
+	<link rel="apple-touch-icon" sizes="114x114" href="distr/images/apple-touch-icon-114x114.png"/>
+
+	<meta name="theme-color" content="#66749E"/>
+	<meta name="msapplication-navbutton-color" content="#66749E"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="#66749E"/>
+	
+	<!-- Google Universal Ad Script -->
+	
+
+	<!-- Google Ad Page Level -->
+	
+
+<script type="text/javascript" src="/js/script.js"></script></head>
+
+<body>
+
+	<header class="main-head">
+		
+		<div class="container-fluid">
+			
+			<div class="row">
+				<div class="col-md-6">
+
+					<a href="#" class="toggle-mnu d-xl-none d-lg-none d-md-none"><span></span></a>
+					
+					<a href="#" class="logo">
+						<img src="distr/images/img-logo-white.svg" alt="WebDesign Master"/>
+						<strong>WebDesign Master</strong>
+						<p>Уроки создания сайтов</p>
+					</a>
+
+				</div>
+				<div class="col-md-6">
+					
+					<div class="social d-none d-md-block d-lg-block d-xl-block">
+						<a title="Вконтакте" href="#" rel="nofollow"><i class="fa fa-vk"></i></a>
+						<a title="YouTube" href="#" rel="nofollow"><i class="fa fa-youtube-play"></i></a>
+						<a title="Twitter" href="#" rel="nofollow"><i class="fa fa-twitter"></i></a>
+						<a title="GitHub" href="#" rel="nofollow"><i class="fa fa-github"></i></a>
+						<a title="RSS" href="#"><i class="fa fa-rss"></i></a>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="mobile-menu"></div>
+
+		</div>
+		
+	</header>
+
+	<div class="preloader run-animation"></div>
+	<div id="blocka"></div>
+
+	<div class="content">
+		<div class="container-fluid">
+
+			<div class="row">
+				
+				<div class="col-md-8">
+
+					<div class="ad-line">
+						
+						<!-- WDM -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1743531875740648" data-ad-slot="9845443679" data-ad-format="auto"></ins>
+
+
+
+					</div>
+
+					<div class="pjax-container">
+						
+						<article class="list-item single-page">
+	<div class="item-link">
+		<div class="item-img-wrap">
+			<img class="responsive-img" src="distr/images/img-preview.jpg" alt="Gulp для самых маленьких - подробное руководство"/>
+		</div>
+		<div class="item-content">
+			<div class="td">
+				<div class="item-date hidden-xs">
+					09 <small>03/2016</small>
+				</div>
+			</div>
+			<div class="td">
+				<h1>
+					<span class="title-cat"><i class="fa fa-cogs"></i> Инструменты:</span>
+					<span class="pos-title">Gulp для самых маленьких - подробное руководство</span>
+				</h1>
+			</div>
+
+			<div class="article-content">
+				
+				<p>Всем привет, друзья! Сегодня мы подробно рассмотрим, что такое Gulp и как с его помощью можно автоматизировать работу Front-end разработчика. В результате урока мы соберем серьезное и внушительное рабочее Front-end окружение для веб-разработки с использованием Gulp.</p>
+
+<h3>Видео урок:</h3>
+
+<div class="likely">
+	<div class="vkontakte">Поделиться</div>
+	<div class="twitter">Твитнуть</div>
+	<div class="facebook">Поделиться</div>
+	<div class="odnoklassniki">Класснуть</div>
+	<div class="gplus">Плюсануть</div>
+	<div class="pinterest" data-media="i/pinnable.jpg">Запинить</div>
+</div>
+
+
+<div class="video-wrap">
+	<div class="table">
+		<div class="tr">
+			<div class="td">
+				<div class="videowrapper">
+					
+				</div>
+				<a href="#" class="button button-youtube" rel="nofollow"><i class="fa fa-youtube-play"></i>Смотреть <span class="hidden-md hidden-sm hidden-xs">урок </span>на YouTube</a>
+			</div>
+			<div class="td ad-table">
+				
+				<!-- 336x280 -->
+<ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-1743531875740648" data-ad-slot="3066073674"></ins>
+
+
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<blockquote>
+<h3>Основные ресурсы урока:</h3>
+<p>Node.js: <a rel="nofollow" href="#">https://nodejs.org/en/</a></p>
+<p>Gulp: <a rel="nofollow" href="#">http://gulpjs.com/</a></p>
+<p>Bower: <a rel="nofollow" href="#">http://bower.io/</a></p>
+<p>Browsersync: <a rel="nofollow" href="#">https://browsersync.io/</a></p>
+</blockquote>
+
+<blockquote>Проект-пример из данного урока вы можете посмотреть на GitHub и скачать: <a rel="nofollow" href="#">https://github.com/agragregra/gulp-lesson</a></blockquote>
+
+<p><strong>Gulp</strong> - это инструмент, который помогает автоматизировать рутинные задачи веб-разработки. Gulp предназначен для решения таких задач, как:</p>
+
+<ul>
+	<li>Создание веб-сервера и автоматическая перезагрузка страницы в браузере при сохранении кода, слежение за изменениями в файлах проекта;</li>
+	<li>Использование различных JavaScript, CSS и HTML препроцессоров (CoffeeScript, Less, Sass, Stylus, Jade и т.д.);</li>
+	<li>Минификация CSS и JS кода, а также, оптимизация и конкатенация отдельных файлов проекта в один;</li>
+	<li>Автоматическое создание вендорных префиксов (приставок к названию CSS свойства, которые добавляют производители браузеров для нестандартных свойств) для CSS.</li>
+	<li>Управление файлами и папками в рамках проекта - создание, удаление, переименование;</li>
+	<li>Запуск и контроль выполнения внешних команд операционной системы;</li>
+	<li>Работа с изображениями - сжатие, создание спрайтов, ресайз (png, jpg, svg и др.);</li>
+	<li>Деплой (отправка на внешний сервер) проекта по FTP, SFTP, Git и т.д.</li>
+	<li>Подключение и использование в проекте безгранично большого количества Node.js и Gulp утилит, программ и плагинов.</li>
+	<li>Создание различных карт проекта и автоматизация другого ручного труда.</li>
+</ul>
+
+<p>Можно с уверенностью сказать, что Gulp и множество утилит, написанных для него, подходят для решения практически любой задачи при разработке проекта любой сложности - от небольшого сайта до крупного проекта.</p>
+
+<p>Любой проект, использующий Gulp имеет в корне файл <strong>gulpfile.js</strong>, который содержит набор инструкций по управлению проектом. Сразу хочется сказать, что написание инструкций для Gulp не является программированием, хотя пишутся на языке JavaScript. Не стоит пугаться больших gulpfile.js, в основном все инструкции однотипные и имеют общие черты. К тому времени, как вы прочтете данное руководство, у вас не должно остаться вопросов по Gulp, так как система сборки элементарная. Но если у вас останутся вопросы - обязательно пишите в комментариях.</p>
+
+<h3>Установка Gulp</h3>
+
+<p>Для работы с Gulp у вас должен быть установлен <a rel="nofollow" href="#">Node.js</a>. Установка Node.js для различных платформ довольно простая - скачиваете инсталлер Node для своей операционной системы и устанавливаете. Я рекомендую устанавливать последнюю версию Stable. Для пользователей Linux я подготовил отдельное видео руководство по установке:</p>
+
+<div class="likely">
+	<div class="vkontakte">Поделиться</div>
+	<div class="twitter">Твитнуть</div>
+	<div class="facebook">Поделиться</div>
+	<div class="odnoklassniki">Класснуть</div>
+	<div class="gplus">Плюсануть</div>
+	<div class="pinterest" data-media="i/pinnable.jpg">Запинить</div>
+</div>
+
+
+<div class="video-wrap">
+	<div class="table">
+		<div class="tr">
+			<div class="td">
+				<div class="videowrapper">
+					
+				</div>
+				<a href="#" class="button button-youtube" rel="nofollow"><i class="fa fa-youtube-play"></i>Смотреть <span class="hidden-md hidden-sm hidden-xs">урок </span>на YouTube</a>
+			</div>
+			<div class="td ad-table">
+				
+				<!-- 336x280 -->
+<ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-1743531875740648" data-ad-slot="3066073674"></ins>
+
+
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<blockquote>Обратите внимание, что при установке Node.js необходимо отметить галочками установку npm и добавление программы в Path:</blockquote>
+
+<img src="distr/images/img-1.jpg" alt="Установка Node.js для Gulp"/>
+
+<p>После того, как Node установлен, можно приступать к установке Gulp. Откройте терминал (Командная строка в Windows) и выполните следующую команду:</p>
+
+<pre>npm i gulp -g
+</pre>
+
+<blockquote>Для пользователей Mac и Linux, возможно, придется выполнять команды с правами суперпользователя, <strong>sudo</strong>.</blockquote>
+
+<p>Из данной команды мы видим, что запускается менеджер пакетов <strong>npm</strong> (Node Package Manager), который командой install устанавливает Gulp в систему. Ключ <strong>-g</strong> говорит о том, что пакет установится в систему глобально, то-есть в систему, а не в папку проекта. Без ключа -g пакет устанавливаются в ту папку, в которой выполняются текущие команды, поэтому будьте внимательны.</p>
+
+<h3>Создание проекта Gulp</h3>
+
+<p>Давайте создадим папку проекта для примера, с которой будем работать, пусть это будет, например, папка <strong>myproject</strong>.</p>
+
+<blockquote>Очень важно! Не создавайте русскоязычные папки проектов и следите за тем, чтобы путь до папки проекта не содержал кириллических символов, то-есть не был написан на русском языке. В противном случае, у вас могут возникнуть проблемы при работе различных утилит Gulp. Папка вашего пользователя также не должна быть русскоязычной. Всё только латинскими буквами.</blockquote>
+
+<p>Теперь откроем терминал в папке проекта. Для пользователей Windows достаточно зажать Shift и открыть контекстное меню. В нем появится пункт &#34;Открыть окно команд&#34;:</p>
+
+<img src="distr/images/img-2.jpg" alt="Открыть окно команд для первоначальной настройки Gulp проекта"/>
+
+<p>Далее выполним инициализацию проекта в той папке, которую создали:</p>
+
+<pre>npm init
+</pre>
+
+<p>Следуя инструкциям, заполним метаинформацию о нашем проекте:</p>
+
+<ol>
+	<li>
+		<p>Назовем проект &#34;MyProject&#34;</p>
+		<img src="distr/images/img-3.jpg" alt="Название Gulp проекта"/>
+	</li>
+	<li>
+		<p>Оставим версию текущей - 1.0.0</p>
+		<img src="distr/images/img-4.jpg" alt="Версия проекта Gulp"/>
+	</li>
+	<li>
+		<p>Введем краткое описание проекта - My First Gulp Project:</p>
+		<img src="distr/images/img-5.jpg" alt="Мой первый Gulp проект"/>
+	</li>
+	<li>entry point, test command, git repository, keywords оставим по-умолчанию.</li>
+	<li>
+		<p>Имя автора можно и указать :-)</p>
+		<img src="distr/images/img-6.jpg" alt="Имя автора в Gulp проекте"/>
+	</li>
+	<li>
+		<p>license оставляем по-умолчанию и вводим yes:</p>
+		<img src="distr/images/img-7.jpg" alt="Подтверждаем создание Gulp проекта"/>
+	</li>
+</ol>
+
+<p>В результате такой несложной первоначальной настройки нашего нового Gulp проекта в папке myproject нарисуется новый файл <strong>package.json</strong>.</p>
+
+<img src="distr/images/img-8.jpg" alt="Новый файл package.json"/>
+
+<p>Файл package.json является файлом манифеста нашего проекта, который описывает помимо той информации, что мы внесли в терминале, еще и информацию об используемых пакетах в нашем проекте.</p>
+
+<p>Например, если мы установим в проект Gulp с ключом <strong>--save-dev</strong>, то пакет и используемая версия автоматически добавится в наш package.json. Такой учет позволит быстро разворачивать новый проект с использованием уже имеющегося package.json и устанавливать необходимые модули с зависимостями, которые прописаны в package.json в новых проектах.</p>
+
+<p>Давайте установим в наш проект Gulp:</p>
+
+<pre>npm i gulp --save-dev
+</pre>
+
+<p>Что мы видим из данной строки: npm устанавливает пакет gulp в текущую папку myproject (потому, что нет ключа -g, устанавливающий пакет глобально в систему) и сохраняет название пакета с версией в файл package.json:</p>
+
+<img src="distr/images/img-9.jpg" alt="Наполнение файла package.json"/>
+
+<p>Кроме того, у нас появляется папка <strong>node_modules</strong>, которая теперь содержит установленный пакет gulp и необходимые зависимости. В данную папку автоматически будут сваливаться все модули и зависимости, которые мы будем устанавливать в проект. Папок  с зависимостями может быть очень много, не смотря на то, что мы установили не так уж и много пакетов. Это связано с тем, что в дополнение к основным пакетам устанавливаются программы, необходимые для корректной работы основного пакета. Ни чего чистить и удалять из папки node_modules не нужно.</p>
+
+<h3>Общепринятая структура каталогов в проектах</h3>
+
+<p>Работая с различными плагинами, программами и скриптами, будь то jQuery плагин, модуль для CMS, веб-проект или какое-то другое ПО, вы наверняка замечали, что у всех проектов есть общая структура каталогов, например, большинство проектов имеет папку <strong>dist</strong> и <strong>app</strong>. Давайте создадим первоначальную структуру нашего учебного проекта по всем правилам хорошего тона веб-разработки. В результате мы должны создать следующую структуру в нашем проекте myproject (все файлы, которых не было, пока создаем пустыми):</p>
+
+<ul>
+	<li>
+		<i class="fa fa-folder"></i> <strong>myproject/</strong>
+		<ul>
+			<li>
+				<i class="fa fa-folder"></i> <strong>app/</strong>
+				<ul>
+					<li>
+						<i class="fa fa-folder"></i> <strong>css/</strong>
+					</li>
+					<li>
+						<i class="fa fa-folder"></i> <strong>fonts/</strong>
+					</li>
+					<li>
+						<i class="fa fa-folder"></i> <strong>img/</strong>
+					</li>
+					<li>
+						<i class="fa fa-folder"></i> <strong>js/</strong>
+					</li>
+					<li>
+						<i class="fa fa-folder"></i> <strong>sass/</strong>
+					</li>
+					<li><i class="fa fa-html5"></i> <strong>index.html</strong></li>
+				</ul>
+			</li>
+			<li>
+				<i class="fa fa-folder"></i> <strong>dist/</strong>
+			</li>
+			<li>
+				<i class="fa fa-folder"></i> <strong>node_modules/</strong>
+			</li>
+			<li>
+				<i class="fa fa-file-text-o"></i> <strong>gulpfile.js</strong>
+			</li>
+			<li>
+				<i class="fa fa-file-text-o"></i> <strong>package.json</strong>
+			</li>
+		</ul>
+	</li>
+</ul>
+
+<blockquote>Данная структура встречается довольно часто, практически во всех проектах, но это не аксиома и некоторые проекты могут иметь вообще другую структуру. Для данной статьи мы будем использовать именно такую структуру проекта.</blockquote>
+
+<p>Здесь мы видим папку <strong>app/</strong>, в которой будут размещены все исходные материалы проекта - оригинальные CSS, Sass, js файлы библиотек, оригинальные изображения. В общем - это папка исходников нашего проекта.</p>
+
+<p>Папка <strong>dist/</strong> будет содержать уже готовый продукт, оптимизированный, сжатый, причесанный. Это папка продакшена.</p>
+
+<h3>gulpfile.js</h3>
+
+<p>Теперь давайте откроем в редакторе кода <strong>gulpfile.js</strong> и напишем в него:</p>
+
+<pre>var gulp = require(&#39;gulp&#39;);
+</pre>
+
+<p>Данной строчкой мы подключаем Gulp к нашему проекту, посредством функции <strong>require</strong>. Данная функция подключает пакеты из папки node_modules в наш проект, присваивая их переменной. В данном случае, мы создаем переменную <strong>gulp</strong>.</p>
+
+<p>Далее мы уже можем работать с этой переменной и создавать таски (инструкции).</p>
+
+<pre>gulp.task(&#39;mytask&#39;, function() {
+	console.log(&#39;Привет, я таск!&#39;);
+});
+</pre>
+
+<p><strong>mytask</strong> - это название команды, которую вы будете вызывать в нужном вам месте gulpfile.js. Кроме того, можно в командной строке выполнить таск напрямую, написав:</p>
+
+<pre>gulp mytask
+</pre>
+
+<p><strong>gulpfile.js</strong>:</p>
+
+<img src="distr/images/img-10.jpg" alt="gulpfile.js - 1"/>
+
+<p>Результат выполнения команды <strong>gulp mytask</strong>:</p>
+
+<img src="distr/images/img-11.jpg" alt="Выполнение таска Gulp"/>
+
+<p>Это, конечно очень простой базовый пример создания таска. Как правило, таски несколько сложнее и включают некоторые дополнительные команды:</p>
+
+<pre>gulp.task(&#39;mytask&#39;, function () {
+  return gulp.src(&#39;source-files&#39;) // Выборка исходных файлов для обработки плагином
+    .pipe(plugin()) // Вызов Gulp плагина для обработки файла
+    .pipe(gulp.dest(&#39;folder&#39;)) // Вывод результирующего файла в папку назначения (dest - пункт назначения)
+})
+</pre>
+
+<ul>
+	<li><strong>gulp.src</strong> - выборка исходных файлов проекта для обработки плагином;</li>
+	<li><strong>.pipe(plugin())</strong> - вызов Gulp плагина для обработки файла;</li>
+	<li><strong>.pipe(gulp.dest(&#39;folder&#39;))</strong> - вывод результирующего файла в папку назначения (dest - пункт назначения).</li>
+</ul>
+
+<p>Это база Gulp, теперь можно создавать инструкции. Для начала давайте создадим обработчик, который будет компилировать Sass файлы в CSS (CSS препроцессинг).</p>
+
+<h3>Gulp Sass</h3>
+
+<p>Давайте установим пакет <strong>gulp-sass</strong> в наш проект с сохранением версии и названия в package.json.</p>
+
+<blockquote>Обратите внимание, что любые Gulp пакеты, для любых задач, легко гуглятся и имеют вполне исчерпывающие инструкции по подключению на своих хоумпейджах и в документации.</blockquote>
+
+<pre>npm i gulp-sass --save-dev
+</pre>
+
+<p>Далее подключим gulp-sass в файле gulpfile.js. Обратите внимание, что переменные для подключения пакетов можно перечислять через запятую:</p>
+
+<pre>var gulp = require(&#39;gulp&#39;),
+	sass = require(&#39;gulp-sass&#39;); //Подключаем Sass пакет
+</pre>
+
+<p>Давайте создадим в папке app/sass файл <strong>main.sass</strong>, зададим в нем фон body - черный и напишем для него обработчик в gulpfile.js</p>
+
+<img src="distr/images/img-12.jpg" alt="Преобразование Sass в Gulp"/>
+
+<p><strong>gulpfile.js</strong>:</p>
+
+<pre>var gulp = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass = require(&#39;gulp-sass&#39;); //Подключаем Sass пакет
+
+gulp.task(&#39;sass&#39;, function(){ // Создаем таск &#34;sass&#34;
+	return gulp.src(&#39;app/sass/main.sass&#39;) // Берем источник
+		.pipe(sass()) // Преобразуем Sass в CSS посредством gulp-sass
+		.pipe(gulp.dest(&#39;app/css&#39;)) // Выгружаем результата в папку app/css
+});
+</pre>
+
+<p>После этого, логичным будет выполнить в терминале наш новый таск <strong>sass</strong>:</p>
+
+<pre>gulp sass
+</pre>
+
+<p>В результате выполения данной команды в папке app/css появится файл <strong>main.css</strong>.</p>
+
+<img src="distr/images/img-13.jpg" alt="Результат выполнения gulp sass"/>
+
+<p>От таки чудеса, друзя. Как видим, все просто :-)</p>
+
+<h3>Выборка файлов для gulp.src</h3>
+
+<p>В принципе, мы рассмотрели все, что необходимо знать о Gulp, теперь будем углубляться в каждую деталь того, что было изложено выше.</p>
+
+<p>Выборка файлов в примере выше довольно простая, мы брали файл напрямую: <strong>gulp.src(&#39;app/sass/main.sass&#39;)</strong>. Но файлы также можно выбирать по шаблону. Шаблон выборки файлов называется <strong>glob</strong> - <a rel="nofollow" href="#">https://en.wikipedia.org/wiki/Glob_(programming)</a>. Давайте познакомимся ближе со всеми возможностями выборки файлов для обработки.</p>
+
+<h4>Самые распространенные шаблоны выборки</h4>
+
+<ul>
+	<li><strong>*.sass</strong> - выбирает все файлы, имеющие определенное расширение (в данном случае, .sass) <strong>в корневой папке</strong> проекта.</li>
+	<li><strong>**/*.js</strong> - выбирает все файлы с расширением <strong>.js</strong> во всех папках проекта.</li>
+	<li><strong>!header.sass</strong> - исключает файл из общей выборки</li>
+	<li><strong>*.+(scss|sass)</strong> - задает комплексный шаблон для нескольких типов файлов, разделенных вертикальной чертой. В данном примере в выборкупопадут любые sass и scss файлы в корне проекта.</li>
+</ul>
+
+<p>Давайте внесем некоторые изменения в таск <strong>sass</strong> и сделаем его более универсальным:</p>
+
+<pre>gulp.task(&#39;sass&#39;, function(){
+	return gulp.src(&#39;app/sass/**/*.sass&#39;) // Берем все sass файлы из папки sass и дочерних, если таковые будут
+		.pipe(sass())
+		.pipe(gulp.dest(&#39;app/css&#39;))
+});
+</pre>
+
+<p>Дело в том, что брать напрямую один отдельный файл не всегда удобно, так как в папке <strong>sass</strong> могут появиться и другие файлы с расширением sass, которые могут использоваться в проекте.</p>
+
+<blockquote>Обратите внимание, что файлы sass, которые предназначены для импорта в другие файлы, как части одного общего, начинаются с нижнего подчеркивания <strong>_part-1.sass</strong>. Такие файлы не учавствуют в компиляции, как отдельные файлы, а добавляются через @import в основные файлы.</blockquote>
+
+<img src="distr/images/img-14.jpg" alt="gulp sass partials"/>
+
+<h3>Наблюдение за изменениями в файлах (Gulp Watch)</h3>
+
+<p>Gulp поддерживает метод <strong>watch</strong> для проверки сохраняемых файлов и имеет следующий синтаксис:</p>
+
+<pre>gulp.watch(&#39;watch-files&#39;, [&#39;task1&#39;, &#39;task2&#39;]); 
+</pre>
+
+<p>Если мы, например, хотим наблюдать за всеми изменениями в файлах sass нашего проекта, то можем использовать следующую конструкцию:</p>
+
+<pre>gulp.watch(&#39;app/sass/**/*.sass&#39;, [&#39;sass&#39;]);
+</pre>
+
+<p>Что мы видим: Gulp наблюдает за всеми sass файлами и при сохранении выполняет таск sass, который автоматически компилирует их в css файлы.</p>
+
+<p>Также, мы можем создать отдельный таск для наблюдения за всеми необходимыми файлами</p>
+
+<pre>gulp.task(&#39;watch&#39;, function() {
+	gulp.watch(&#39;app/sass/**/*.sass&#39;, [&#39;sass&#39;]); // Наблюдение за sass файлами
+	// Наблюдение за другими типами файлов
+});
+</pre>
+
+<p>Если мы запустим в консоли <strong>gulp watch</strong>, то Gulp будет автоматически следить за всеми измененями в файлах sass при сохранении и компилировать их в css.</p>
+
+<p>Было бы неплохо в дополнение к этой красоте сделать автоматическую перезагрузку страницы при изменениях в файлах. Для этой задачи нам подойдет <a rel="nofollow" href="#">Browser Sync</a>.</p>
+
+<h3>Автоматическое обновление страниц с использованием Bbrowser Sync</h3>
+
+<p><strong>Browser Sync</strong> - это отличное решение для LiveReload страниц при сохранении файлов. При чем релоад происходит не только в одном браузере, но и во всех браузерах сети, будь это мобильные устройства или другие компьютеры в одной Wi-Fi сети.</p>
+
+<p>Мы уже умеем устанавливать дополнения для Gulp, поэтому давайте установим Browser Sync в наш проект:</p>
+
+<pre>npm i browser-sync --save-dev
+</pre>
+
+<p>И, конечно-же, подключим в файле gulpfile.js, как мы это делали ранее с пакетом gulp-sass.</p>
+
+<pre>var gulp      = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass        = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync = require(&#39;browser-sync&#39;); // Подключаем Browser Sync
+</pre>
+
+<p>Создаем таск для Browser Sync:</p>
+
+<pre>gulp.task(&#39;browser-sync&#39;, function() { // Создаем таск browser-sync
+	browserSync({ // Выполняем browser Sync
+		server: { // Определяем параметры сервера
+			baseDir: &#39;app&#39; // Директория для сервера - app
+		},
+		notify: false // Отключаем уведомления
+	});
+});
+</pre>
+
+<p>Отлично! Наш сервер для работы и автоматического релоада готов. Теперь давайте последим за изменениями в Sass. Если файл Sass обновляется, автоматически инжектим в HTML измененный CSS файл:</p>
+
+<pre>gulp.task(&#39;sass&#39;, function(){ // Создаем таск Sass
+	return gulp.src(&#39;app/sass/**/*.sass&#39;) // Берем источник
+		.pipe(sass()) // Преобразуем Sass в CSS посредством gulp-sass
+		.pipe(gulp.dest(&#39;app/css&#39;)) // Выгружаем результата в папку app/css
+		.pipe(browserSync.reload({stream: true})) // Обновляем CSS на странице при изменении
+});
+</pre>
+
+<p>Все, что нам осталось сделать - это запустить таск browser-sync перед тем, как запустится <strong>gulp watch</strong>. Немного модифицируем таск <strong>watch</strong>, добавив выполнение <strong>browser-sync</strong> и <strong>sass</strong> до запуска <strong>watch</strong>:</p>
+
+<pre>gulp.task(&#39;watch&#39;, [&#39;browser-sync&#39;, &#39;sass&#39;], function() {
+	gulp.watch(&#39;app/sass/**/*.sass&#39;, [&#39;sass&#39;]); // Наблюдение за sass файлами
+	// Наблюдение за другими типами файлов
+});
+</pre>
+
+<blockquote>Обратите внимание, что мы выполняем таски [&#39;browser-sync&#39;, &#39;sass&#39;] до запуска <strong>watch</strong>, так как их выполнение необходимо нам для корректного отображения изменений на момент запуска сервера.</blockquote>
+
+<p>Расположим таск watch после всех других тасков и в результате получим такой <strong>gulpfile.js</strong>:</p>
+
+<pre>var gulp      = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass        = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync = require(&#39;browser-sync&#39;); // Подключаем Browser Sync
+
+gulp.task(&#39;sass&#39;, function(){ // Создаем таск Sass
+	return gulp.src(&#39;app/sass/**/*.sass&#39;) // Берем источник
+		.pipe(sass()) // Преобразуем Sass в CSS посредством gulp-sass
+		.pipe(gulp.dest(&#39;app/css&#39;)) // Выгружаем результата в папку app/css
+		.pipe(browserSync.reload({stream: true})) // Обновляем CSS на странице при изменении
+});
+
+gulp.task(&#39;browser-sync&#39;, function() { // Создаем таск browser-sync
+	browserSync({ // Выполняем browserSync
+		server: { // Определяем параметры сервера
+			baseDir: &#39;app&#39; // Директория для сервера - app
+		},
+		notify: false // Отключаем уведомления
+	});
+});
+
+gulp.task(&#39;watch&#39;, [&#39;browser-sync&#39;, &#39;sass&#39;], function() {
+	gulp.watch(&#39;app/sass/**/*.sass&#39;, [&#39;sass&#39;]); // Наблюдение за sass файлами
+	// Наблюдение за другими типами файлов
+});
+</pre>
+
+<p>Для того, чтобы следить за изменениями в браузере, сделаем соответствующую разметку в файле index.html директории app с подключением файла стилей <strong>main.css</strong>:</p>
+
+<pre data-lang="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+	&lt;meta charset=&#34;UTF-8&#34;&gt;
+	&lt;title&gt;Document&lt;/title&gt;
+	&lt;link rel=&#34;stylesheet&#34; href=&#34;css/main.css&#34;&gt; <!-- Подключаем CSS -->
+&lt;/head&gt;
+&lt;body&gt;
+	
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p>Результат завораживает:</p>
+
+<img src="distr/images/img-15.jpg" alt="результат выполнения таска watch в Gulp"/>
+
+<p>Давайте разберемся, что у нас происходит в консоли:</p>
+
+<img src="distr/images/img-16.jpg" alt="Консоль выполнения Gulp"/>
+
+<p>После того, как мы нарадуемся результату, встает весьма ожидаемый вопрос - а как, собтвенно, обновлять страницу при сохранении HTML и JS?</p>
+
+<p>И эта задача нам по плечу:</p>
+
+<pre>gulp.task(&#39;watch&#39;, [&#39;browser-sync&#39;, &#39;sass&#39;], function() {
+	gulp.watch(&#39;app/sass/**/*.sass&#39;, [&#39;sass&#39;]); // Наблюдение за sass файлами в папке sass
+	gulp.watch(&#39;app/*.html&#39;, browserSync.reload); // Наблюдение за HTML файлами в корне проекта
+	gulp.watch(&#39;app/js/**/*.js&#39;, browserSync.reload); // Наблюдение за JS файлами в папке js
+});
+</pre>
+
+<p>Здесь мы используем функцию browserSync.reload, которую нам любезно предоставил пакет Browser Sync. Обратите внимание на выборку файлов для слежения.</p>
+
+<p>В принципе, мы уже имеем довольно продвинутое рабочее окружение. Но двигаемся дальше, это не все, на что способен Gulp.</p>
+
+<h3>Оптимизация JavaScript</h3>
+
+<p>Давайте рассмотрим, как можно оптимизировать JS файлы проекта. Чаще всего, в оптимизации нуждаются библиотеки и сторонние jQuery и JavaScript плагины. Давайте создадим в папке <strong>app</strong> паку <strong>libs</strong>, которая будет содержать необходимые проекту библиотеки. Все библиотеки будем размещать в отдельных папках. Для установки новых библиотек я советую использовать <a rel="nofollow" href="#">Bower</a>.</p>
+
+<p>Установим Bower:</p>
+
+<pre>npm i -g bower</pre>
+
+<blockquote>Обратите внимание, что для работы Bower необходим установленный <a rel="nofollow" href="#">Git</a>.</blockquote>
+
+<p>Теперь в папке проекта создадим файл <strong>.bowerrc</strong>, в который напишем:</p>
+
+<pre>{
+	&#34;directory&#34; : &#34;app/libs/&#34;
+}
+</pre>
+
+<blockquote>Если вы пользователь ОС Windows, у вас не получится создать файл, начинающийся с точки. Воспользуйтесь FileZilla или каким-нибудь файловым менеджером для этой задачи.</blockquote>
+
+<p>Данной настройкой мы указываем путь по умолчанию для установки плагинов с помощью <strong>Bower.</strong></p>
+
+<p>Установим jQuery и Magnific Popup, для примера:</p>
+
+<pre>bower i jquery magnific-popup
+</pre>
+
+<p>Круть:</p>
+
+<img src="distr/images/img-17.jpg" alt="Установка плагинов в Gulp проект"/>
+
+<p>Обратите внимание, что все (ну, или почти все) плагины имеют папку dist, об этом мы говорили ранее. В этой папке располагаются готовые файлы продакшена, которые мы и будем использовать в нашем проекте.</p>
+
+<p>Давайте создадим таск <strong>scripts</strong>, который будет собирать все JS файлы библиотек в один и минифицировать файл. Для этого установим 2 пакета: <strong>gulp-concat и gulp-uglifyjs</strong>.</p>
+
+<pre>npm i --save-dev gulp-concat gulp-uglifyjs
+</pre>
+
+<p>Подключим новые библиотеки в gulpfile.js:</p>
+
+<pre>var gulp      = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass        = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync = require(&#39;browser-sync&#39;), // Подключаем Browser Sync
+	concat      = require(&#39;gulp-concat&#39;), // Подключаем gulp-concat (для конкатенации файлов)
+	uglify      = require(&#39;gulp-uglifyjs&#39;); // Подключаем gulp-uglifyjs (для сжатия JS)
+</pre>
+
+<p>Создаем задачу для сборки и сжатия всех библиотек (перед watch):</p>
+
+<pre>gulp.task(&#39;scripts&#39;, function() {
+	return gulp.src([ // Берем все необходимые библиотеки
+		&#39;app/libs/jquery/dist/jquery.min.js&#39;, // Берем jQuery
+		&#39;app/libs/magnific-popup/dist/jquery.magnific-popup.min.js&#39; // Берем Magnific Popup
+		])
+		.pipe(concat(&#39;libs.min.js&#39;)) // Собираем их в кучу в новом файле libs.min.js
+		.pipe(uglify()) // Сжимаем JS файл
+		.pipe(gulp.dest(&#39;app/js&#39;)); // Выгружаем в папку app/js
+});
+</pre>
+
+<p>Давайте проверим, как работает наш новый таск <strong>scripts</strong>, выполнив в терминале:</p>
+
+<pre>gulp scripts
+</pre>
+
+<img src="distr/images/img-18.jpg" alt="gulp scripts"/>
+
+<p>Выполнение таска <strong>scripts</strong> можно запустить перед выполнением watch:</p>
+
+<img src="distr/images/img-19.jpg" alt="Добавление таска scripts перед watch в gulp file js"/>
+
+<p>Далее можно подключить к проекту все необходимые CSS файлы библиотек. В нашем случае, только одна библиотека нуждается в подключении - это Magnific Popup. Сделаем это через <strong>@import</strong> в Sass фале <strong>sass/libs.sass</strong>:</p>
+
+<pre data-lang="sass">@import &#34;app/libs/magnific-popup/dist/magnific-popup&#34; // Импортируем библиотеку Magnific Popup
+</pre>
+
+<blockquote>Обратите внимание, что при импорте в Sass простых CSS файлов библиотек, расширение файла .css не указывается.</blockquote>
+
+<p>На выходе, в папке app/css мы получаем дополнительно к main.css файл libs.css, который содержит стили всех библиотек. Файл main.css нет особого смысла минифицировать, так как он содержит кастомные (пользовательские) стили. А вот файл libs.css мы с удовольствием минифицируем.</p>
+
+<p>Для минификации CSS установим пакеты <strong>gulp-cssnano</strong> и <strong>gulp-rename</strong>:</p>
+
+<pre>npm i gulp-cssnano gulp-rename --save-dev
+</pre>
+
+<p>И подключим их в нашем gulpfile.js:</p>
+
+<pre>var gulp      = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass        = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync = require(&#39;browser-sync&#39;), // Подключаем Browser Sync
+	concat      = require(&#39;gulp-concat&#39;), // Подключаем gulp-concat (для конкатенации файлов)
+	uglify      = require(&#39;gulp-uglifyjs&#39;), // Подключаем gulp-uglifyjs (для сжатия JS)
+	cssnano     = require(&#39;gulp-cssnano&#39;), // Подключаем пакет для минификации CSS
+	rename      = require(&#39;gulp-rename&#39;); // Подключаем библиотеку для переименования файлов
+</pre>
+
+<p>И создадим соответствующий таск <strong>css-libs</strong>. Сразу добавим данный таск в watch для того, чтобы библиотеки собирались в процессе запуска проекта. Таск sass лучше вызвать до запуска css-libs, чтобы нам было что минифицировать:</p>
+
+<pre>gulp.task(&#39;css-libs&#39;, [&#39;sass&#39;], function() {
+	return gulp.src(&#39;app/css/libs.css&#39;) // Выбираем файл для минификации
+		.pipe(cssnano()) // Сжимаем
+		.pipe(rename({suffix: &#39;.min&#39;})) // Добавляем суффикс .min
+		.pipe(gulp.dest(&#39;app/css&#39;)); // Выгружаем в папку app/css
+});
+
+gulp.task(&#39;watch&#39;, [&#39;browser-sync&#39;, &#39;css-libs&#39;, &#39;scripts&#39;], function() {
+	gulp.watch(&#39;app/sass/**/*.sass&#39;, [&#39;sass&#39;]); // Наблюдение за sass файлами в папке sass
+	gulp.watch(&#39;app/*.html&#39;, browserSync.reload); // Наблюдение за HTML файлами в корне проекта
+	gulp.watch(&#39;app/js/**/*.js&#39;, browserSync.reload);   // Наблюдение за JS файлами в папке js
+});
+</pre>
+
+<p>Ура:</p>
+
+<img src="distr/images/img-20.jpg" alt="Создаем main.min.css в Gulp"/>
+
+<h3>Подготовка к продакшену</h3>
+
+<p>Для продакшена (сборки в папку dist) мы создадим отдельный таск build в конце gulpfile.js. В данной инструкции мы осуществим сборку Sass, JS и выгрузку того, что у нас готово в папку dist.</p>
+
+<pre>gulp.task(&#39;build&#39;, [&#39;sass&#39;, &#39;scripts&#39;], function() {
+
+	var buildCss = gulp.src([ // Переносим CSS стили в продакшен
+		&#39;app/css/main.css&#39;,
+		&#39;app/css/libs.min.css&#39;
+		])
+	.pipe(gulp.dest(&#39;dist/css&#39;))
+
+	var buildFonts = gulp.src(&#39;app/fonts/**/*&#39;) // Переносим шрифты в продакшен
+	.pipe(gulp.dest(&#39;dist/fonts&#39;))
+
+	var buildJs = gulp.src(&#39;app/js/**/*&#39;) // Переносим скрипты в продакшен
+	.pipe(gulp.dest(&#39;dist/js&#39;))
+
+	var buildHtml = gulp.src(&#39;app/*.html&#39;) // Переносим HTML в продакшен
+	.pipe(gulp.dest(&#39;dist&#39;));
+
+});
+</pre>
+
+<p>Здесь, присваивая переменным какие-либо действия, мы их выполняем. Таким образом можно выполнять мультизадачные таски. Можно и не присваивать, но мы сделаем так, ибо красивше.</p>
+
+<p>Все прекрасно, но всегда есть одно &#34;Но&#34;. Перед тем, как собирать проект нам желательно бы очистить папку dist, чтобы не оставалось лишних потрохов от предыдущих итераций с нашим проектом.</p>
+
+<p>Установим и подключим пакет del:</p>
+
+<pre>npm i del --save-dev</pre>
+
+<pre>var gulp      = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass        = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync = require(&#39;browser-sync&#39;), // Подключаем Browser Sync
+	concat      = require(&#39;gulp-concat&#39;), // Подключаем gulp-concat (для конкатенации файлов)
+	uglify      = require(&#39;gulp-uglifyjs&#39;), // Подключаем gulp-uglifyjs (для сжатия JS)
+	cssnano     = require(&#39;gulp-cssnano&#39;), // Подключаем пакет для минификации CSS
+	rename      = require(&#39;gulp-rename&#39;), // Подключаем библиотеку для переименования файлов
+	del         = require(&#39;del&#39;); // Подключаем библиотеку для удаления файлов и папок
+</pre>
+
+<p>Создаем таск очистки <strong>clean</strong> и добавляем его выполнение перед выполнение build:</p>
+
+<pre>gulp.task(&#39;clean&#39;, function() {
+	return del.sync(&#39;dist&#39;); // Удаляем папку dist перед сборкой
+});
+
+gulp.task(&#39;build&#39;, [&#39;clean&#39;, &#39;sass&#39;, &#39;scripts&#39;], function() {
+
+	var buildCss = gulp.src([ // Переносим библиотеки в продакшен
+		&#39;app/css/main.css&#39;,
+		&#39;app/css/libs.min.css&#39;
+		])
+	.pipe(gulp.dest(&#39;dist/css&#39;))
+
+	var buildFonts = gulp.src(&#39;app/fonts/**/*&#39;) // Переносим шрифты в продакшен
+	.pipe(gulp.dest(&#39;dist/fonts&#39;))
+
+	var buildJs = gulp.src(&#39;app/js/**/*&#39;) // Переносим скрипты в продакшен
+	.pipe(gulp.dest(&#39;dist/js&#39;))
+
+	var buildHtml = gulp.src(&#39;app/*.html&#39;) // Переносим HTML в продакшен
+	.pipe(gulp.dest(&#39;dist&#39;));
+
+});
+</pre>
+
+<h3>Оптимизация изображений</h3>
+
+<p>Как вы могли заметить, в нашем проекте на продакшене не хватает изображений. Давайте исправим это недоразумение и добавим обработку изображений в наш проект.</p>
+
+<p>В папке app/img есть 3 изображения, которые нам необходимо перенести в папку продакшена, оптимизируя.</p>
+
+<img src="distr/images/img-21.jpg" alt="Изображения для Gulp"/>
+
+<p>Для оптимизации изображений установим 2 пакета (<strong>gulp-imagemin</strong>, <strong>imagemin-pngquant</strong>) и подключим их:</p>
+
+<pre>npm i gulp-imagemin imagemin-pngquant --save-dev
+</pre>
+
+<pre>var gulp      = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass        = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync = require(&#39;browser-sync&#39;), // Подключаем Browser Sync
+	concat      = require(&#39;gulp-concat&#39;), // Подключаем gulp-concat (для конкатенации файлов)
+	uglify      = require(&#39;gulp-uglifyjs&#39;), // Подключаем gulp-uglifyjs (для сжатия JS)
+	cssnano     = require(&#39;gulp-cssnano&#39;), // Подключаем пакет для минификации CSS
+	rename      = require(&#39;gulp-rename&#39;), // Подключаем библиотеку для переименования файлов
+	del         = require(&#39;del&#39;), // Подключаем библиотеку для удаления файлов и папок
+	imagemin    = require(&#39;gulp-imagemin&#39;), // Подключаем библиотеку для работы с изображениями
+	pngquant    = require(&#39;imagemin-pngquant&#39;); // Подключаем библиотеку для работы с png
+</pre>
+
+<p>Далее создадим таск <strong>img</strong> для сжатия изображений на продакшен и вызовем его после очистки:</p>
+
+<pre>gulp.task(&#39;img&#39;, function() {
+	return gulp.src(&#39;app/img/**/*&#39;) // Берем все изображения из app
+		.pipe(imagemin({ // Сжимаем их с наилучшими настройками
+			interlaced: true,
+			progressive: true,
+			svgoPlugins: [{removeViewBox: false}],
+			use: [pngquant()]
+		}))
+		.pipe(gulp.dest(&#39;dist/img&#39;)); // Выгружаем на продакшен
+});
+
+gulp.task(&#39;build&#39;, [&#39;clean&#39;, &#39;img&#39;, &#39;sass&#39;, &#39;scripts&#39;], function() {
+
+	var buildCss = gulp.src([ // Переносим библиотеки в продакшен
+		&#39;app/css/main.css&#39;,
+		&#39;app/css/libs.min.css&#39;
+		])
+	.pipe(gulp.dest(&#39;dist/css&#39;))
+
+	var buildFonts = gulp.src(&#39;app/fonts/**/*&#39;) // Переносим шрифты в продакшен
+	.pipe(gulp.dest(&#39;dist/fonts&#39;))
+
+	var buildJs = gulp.src(&#39;app/js/**/*&#39;) // Переносим скрипты в продакшен
+	.pipe(gulp.dest(&#39;dist/js&#39;))
+
+	var buildHtml = gulp.src(&#39;app/*.html&#39;) // Переносим HTML в продакшен
+	.pipe(gulp.dest(&#39;dist&#39;));
+
+});
+</pre>
+
+<p>Все прекрасно. До тех пор, пока количество изображений в проекте не превышает 3 шт. Большое количество картинок будет обрабатываться значительно дольше, поэтому к обработке изображений было бы неплохо добавить кеш, чтобы картинки кешировались, экономя наше время.</p>
+
+<p>Установи м подключим <strong>gulp-cache</strong>:</p>
+
+<pre>npm i gulp-cache --save-dev
+</pre>
+
+<pre>var gulp      = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass        = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync = require(&#39;browser-sync&#39;), // Подключаем Browser Sync
+	concat      = require(&#39;gulp-concat&#39;), // Подключаем gulp-concat (для конкатенации файлов)
+	uglify      = require(&#39;gulp-uglifyjs&#39;), // Подключаем gulp-uglifyjs (для сжатия JS)
+	cssnano     = require(&#39;gulp-cssnano&#39;), // Подключаем пакет для минификации CSS
+	rename      = require(&#39;gulp-rename&#39;), // Подключаем библиотеку для переименования файлов
+	del         = require(&#39;del&#39;), // Подключаем библиотеку для удаления файлов и папок
+	imagemin    = require(&#39;gulp-imagemin&#39;), // Подключаем библиотеку для работы с изображениями
+	pngquant    = require(&#39;imagemin-pngquant&#39;), // Подключаем библиотеку для работы с png
+	cache       = require(&#39;gulp-cache&#39;); // Подключаем библиотеку кеширования
+</pre>
+
+<p>Модифицируем таск <strong>img</strong>:</p>
+
+<pre>gulp.task(&#39;img&#39;, function() {
+	return gulp.src(&#39;app/img/**/*&#39;) // Берем все изображения из app
+		.pipe(cache(imagemin({  // Сжимаем их с наилучшими настройками с учетом кеширования
+			interlaced: true,
+			progressive: true,
+			svgoPlugins: [{removeViewBox: false}],
+			use: [pngquant()]
+		})))
+		.pipe(gulp.dest(&#39;dist/img&#39;)); // Выгружаем на продакшен
+});
+</pre>
+
+<h3>Автоматическое создание префиксов CSS с помощью Gulp</h3>
+
+<p>Вендорные префиксы необходимы для обеспечения максимальной совместимости со всеми современными браузерами. Было бы логично сделать автоматическое добавление префиксов, чтобы написав в CSS или Sass:</p>
+
+<pre>display: flex
+</pre>
+
+<p>Мы получили на выходе:</p>
+
+<pre>display: -webkit-flex;
+display: -moz-flex;
+display: -ms-flex;
+display: -o-flex;
+display: flex;
+</pre>
+
+<p>Установим пакет <strong>gulp-autoprefixer</strong> и подключим его в gulpfile.js:</p>
+
+<pre>npm i --save-dev gulp-autoprefixer
+</pre>
+
+<pre>var gulp       = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass         = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync  = require(&#39;browser-sync&#39;), // Подключаем Browser Sync
+	concat       = require(&#39;gulp-concat&#39;), // Подключаем gulp-concat (для конкатенации файлов)
+	uglify       = require(&#39;gulp-uglifyjs&#39;), // Подключаем gulp-uglifyjs (для сжатия JS)
+	cssnano      = require(&#39;gulp-cssnano&#39;), // Подключаем пакет для минификации CSS
+	rename       = require(&#39;gulp-rename&#39;), // Подключаем библиотеку для переименования файлов
+	del          = require(&#39;del&#39;), // Подключаем библиотеку для удаления файлов и папок
+	imagemin     = require(&#39;gulp-imagemin&#39;), // Подключаем библиотеку для работы с изображениями
+	pngquant     = require(&#39;imagemin-pngquant&#39;), // Подключаем библиотеку для работы с png
+	cache        = require(&#39;gulp-cache&#39;), // Подключаем библиотеку кеширования
+	autoprefixer = require(&#39;gulp-autoprefixer&#39;);// Подключаем библиотеку для автоматического добавления префиксов
+</pre>
+
+<p>И модифицируем наш таск <strong>sass</strong>:</p>
+
+<pre>gulp.task(&#39;sass&#39;, function(){ // Создаем таск Sass
+	return gulp.src(&#39;app/sass/**/*.sass&#39;) // Берем источник
+		.pipe(sass()) // Преобразуем Sass в CSS посредством gulp-sass
+		.pipe(autoprefixer([&#39;last 15 versions&#39;, &#39;&gt; 1%!&(MISSING)#39;, &#39;ie 8&#39;, &#39;ie 7&#39;], { cascade: true })) // Создаем префиксы
+		.pipe(gulp.dest(&#39;app/css&#39;)) // Выгружаем результата в папку app/css
+		.pipe(browserSync.reload({stream: true})) // Обновляем CSS на странице при изменении
+});
+</pre>
+
+<h3>Дефолтный таск Gulp</h3>
+
+<p>Итак, мы имеем 2 главных таска - <strong>gulp watch</strong> - для работы над проектом в режиме &#34;онлайн&#34; и <strong>gulp build</strong> - для сборки проекта на продакшен без лишних файлов, папок и со сжатыми картинками. Так как чаще всего нам нужен будет таск <strong>watch</strong>, можно повесить его на дефолтный таск, чтобы не писать в консоли постоянно gulp watch, а писать просто <strong>gulp</strong>.</p>
+
+<pre>gulp.task(&#39;default&#39;, [&#39;watch&#39;]);
+</pre>
+
+<p>Также, необходимо создать автономный таск для очистки кеша Gulp, чтобы его можно было вызывать простой командой <strong>gulp clear</strong>:</p>
+
+<pre>gulp.task(&#39;clear&#39;, function () {
+	return cache.clearAll();
+})
+</pre>
+
+<p>Если у вас возникнут проблемы с изображениями или другими кешируемыми файлами, просто почистите кеш.</p>
+
+<p>В результате, у нас должен получиться такой <strong>gulpfile.js</strong>:</p>
+
+<pre>var gulp       = require(&#39;gulp&#39;), // Подключаем Gulp
+	sass         = require(&#39;gulp-sass&#39;), //Подключаем Sass пакет,
+	browserSync  = require(&#39;browser-sync&#39;), // Подключаем Browser Sync
+	concat       = require(&#39;gulp-concat&#39;), // Подключаем gulp-concat (для конкатенации файлов)
+	uglify       = require(&#39;gulp-uglifyjs&#39;), // Подключаем gulp-uglifyjs (для сжатия JS)
+	cssnano      = require(&#39;gulp-cssnano&#39;), // Подключаем пакет для минификации CSS
+	rename       = require(&#39;gulp-rename&#39;), // Подключаем библиотеку для переименования файлов
+	del          = require(&#39;del&#39;), // Подключаем библиотеку для удаления файлов и папок
+	imagemin     = require(&#39;gulp-imagemin&#39;), // Подключаем библиотеку для работы с изображениями
+	pngquant     = require(&#39;imagemin-pngquant&#39;), // Подключаем библиотеку для работы с png
+	cache        = require(&#39;gulp-cache&#39;), // Подключаем библиотеку кеширования
+	autoprefixer = require(&#39;gulp-autoprefixer&#39;);// Подключаем библиотеку для автоматического добавления префиксов
+
+gulp.task(&#39;sass&#39;, function(){ // Создаем таск Sass
+	return gulp.src(&#39;app/sass/**/*.sass&#39;) // Берем источник
+		.pipe(sass()) // Преобразуем Sass в CSS посредством gulp-sass
+		.pipe(autoprefixer([&#39;last 15 versions&#39;, &#39;&gt; 1%!&(MISSING)#39;, &#39;ie 8&#39;, &#39;ie 7&#39;], { cascade: true })) // Создаем префиксы
+		.pipe(gulp.dest(&#39;app/css&#39;)) // Выгружаем результата в папку app/css
+		.pipe(browserSync.reload({stream: true})) // Обновляем CSS на странице при изменении
+});
+
+gulp.task(&#39;browser-sync&#39;, function() { // Создаем таск browser-sync
+	browserSync({ // Выполняем browserSync
+		server: { // Определяем параметры сервера
+			baseDir: &#39;app&#39; // Директория для сервера - app
+		},
+		notify: false // Отключаем уведомления
+	});
+});
+
+gulp.task(&#39;scripts&#39;, function() {
+	return gulp.src([ // Берем все необходимые библиотеки
+		&#39;app/libs/jquery/dist/jquery.min.js&#39;, // Берем jQuery
+		&#39;app/libs/magnific-popup/dist/jquery.magnific-popup.min.js&#39; // Берем Magnific Popup
+		])
+		.pipe(concat(&#39;libs.min.js&#39;)) // Собираем их в кучу в новом файле libs.min.js
+		.pipe(uglify()) // Сжимаем JS файл
+		.pipe(gulp.dest(&#39;app/js&#39;)); // Выгружаем в папку app/js
+});
+
+gulp.task(&#39;css-libs&#39;, [&#39;sass&#39;], function() {
+	return gulp.src(&#39;app/css/libs.css&#39;) // Выбираем файл для минификации
+		.pipe(cssnano()) // Сжимаем
+		.pipe(rename({suffix: &#39;.min&#39;})) // Добавляем суффикс .min
+		.pipe(gulp.dest(&#39;app/css&#39;)); // Выгружаем в папку app/css
+});
+
+gulp.task(&#39;watch&#39;, [&#39;browser-sync&#39;, &#39;css-libs&#39;, &#39;scripts&#39;], function() {
+	gulp.watch(&#39;app/sass/**/*.sass&#39;, [&#39;sass&#39;]); // Наблюдение за sass файлами в папке sass
+	gulp.watch(&#39;app/*.html&#39;, browserSync.reload); // Наблюдение за HTML файлами в корне проекта
+	gulp.watch(&#39;app/js/**/*.js&#39;, browserSync.reload);   // Наблюдение за JS файлами в папке js
+});
+
+gulp.task(&#39;clean&#39;, function() {
+	return del.sync(&#39;dist&#39;); // Удаляем папку dist перед сборкой
+});
+
+gulp.task(&#39;img&#39;, function() {
+	return gulp.src(&#39;app/img/**/*&#39;) // Берем все изображения из app
+		.pipe(cache(imagemin({  // Сжимаем их с наилучшими настройками с учетом кеширования
+			interlaced: true,
+			progressive: true,
+			svgoPlugins: [{removeViewBox: false}],
+			use: [pngquant()]
+		})))
+		.pipe(gulp.dest(&#39;dist/img&#39;)); // Выгружаем на продакшен
+});
+
+gulp.task(&#39;build&#39;, [&#39;clean&#39;, &#39;img&#39;, &#39;sass&#39;, &#39;scripts&#39;], function() {
+
+	var buildCss = gulp.src([ // Переносим библиотеки в продакшен
+		&#39;app/css/main.css&#39;,
+		&#39;app/css/libs.min.css&#39;
+		])
+	.pipe(gulp.dest(&#39;dist/css&#39;))
+
+	var buildFonts = gulp.src(&#39;app/fonts/**/*&#39;) // Переносим шрифты в продакшен
+	.pipe(gulp.dest(&#39;dist/fonts&#39;))
+
+	var buildJs = gulp.src(&#39;app/js/**/*&#39;) // Переносим скрипты в продакшен
+	.pipe(gulp.dest(&#39;dist/js&#39;))
+
+	var buildHtml = gulp.src(&#39;app/*.html&#39;) // Переносим HTML в продакшен
+	.pipe(gulp.dest(&#39;dist&#39;));
+
+});
+
+gulp.task(&#39;clear&#39;, function () {
+	return cache.clearAll();
+})
+
+gulp.task(&#39;default&#39;, [&#39;watch&#39;]);
+</pre>
+
+<blockquote>Проект-пример из данного урока вы можете посмотреть на GitHub и скачать: <a rel="nofollow" href="#">https://github.com/agragregra/gulp-lesson</a></blockquote>
+
+<p>Чтобы установить все пакеты и зависимости для скачанного примера, выполните команду <strong>npm i</strong> в папке проекта.</p>
+
+<p>На этом все. Помните - к любому плагину для Gulp есть хорошая документация по подключению и использованию на <a rel="nofollow" href="#">npmjs.com</a> или на страничке GitHub. Спасибо за внимание, друзья!</p>
+
+
+				<div class="premium">
+					<div class="row">
+
+						<div class="col-md-12">
+							<h4>Премиум уроки от WebDesign Master:</h4>
+						</div>
+
+						<div class="col-md-4 col-sm-6">
+							<a class="premium-item" href="#">
+								<img src="distr/images/img-jekyll.jpg" alt="Создание сайта и заработок на нем" class="img-responsive"/>
+								<p>Создание контентного сайта на Jekyll от А до Я</p>
+							</a>
+						</div>
+
+						<div class="col-md-4 col-sm-6">
+							<a class="premium-item" href="#">
+								<img src="distr/images/img-opencart.jpg" alt="Курс по созданию интернет-магазина на OpenCart" class="img-responsive"/>
+								<p>Создание современного интернет-магазина от А до Я</p>
+							</a>
+						</div>
+
+						<div class="col-md-4 col-sm-6">
+							<a class="premium-item" href="#">
+								<img src="distr/images/img-freelance.jpg" alt="Куср по фрилансу" class="img-responsive"/>
+								<p>Я - фрилансер! - Руководство успешного фрилансера</p>
+							</a>
+						</div>
+
+					</div>
+				</div>
+
+
+			</div>
+
+			<div class="comments">
+				<div id="disqus_thread"></div>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+			</div>
+
+		</div>
+	</div>
+
+</article>
+
+<div class="ad-line">
+
+	<!-- WDM -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1743531875740648" data-ad-slot="9845443679" data-ad-format="auto"></ins>
+
+
+
+</div>
+
+					
+					</div>
+
+				</div>
+
+				<div class="col-md-4">
+					
+					<aside class="site-aside">
+						
+						<div class="box box-search">
+
+							<form class="search" action="javascript:void(0)" id="cse-search-box">
+								<div>
+									<input type="hidden" name="cx" value="partner-pub-1743531875740648:2457203272"/>
+									<input type="hidden" name="cof" value="FORID:10"/>
+									<input type="hidden" name="ie" value="UTF-8"/>
+									<input type="text" name="q" size="55" placeholder="Google поиск по сайту..."/>
+									<button name="sa"><i class="fa fa-search"></i></button>
+								</div>
+							</form>
+
+
+						</div>
+
+						<div class="box box-sidebar">
+<!-- WDM -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1743531875740648" data-ad-slot="9845443679" data-ad-format="auto"></ins>
+
+
+						</div>
+					
+						<nav class="box box-mnu">
+							<ul class="list-unstyled">
+
+	<li><a href="#"><i class="fa fa-code"></i> HTML и CSS</a></li>
+	<li><a href="#"><i class="fa fa-wordpress"></i> WordPress</a></li>
+	<li><a href="#"><i class="fa fa-paint-brush"></i> Веб-дизайн</a></li>
+	<li><a href="#"><i class="fa fa-pie-chart"></i> Иллюстрации и Инфографика</a></li>
+	<li><a href="#"><i class="fa fa-cogs"></i> Инструменты</a></li>
+	<li><a href="#"><i class="fa fa-tv"></i> Адаптивный веб-дизайн</a></li>
+	<li><a href="#"><i class="fa icons fa-js"></i> JavaScript</a></li>
+	<li><a href="#"><i class="fa icons fa-jquery"></i> jQuery</a></li>
+	<li><a href="#"><i class="fa fa-modx"></i> MODx</a></li>
+	<li><a href="#"><i class="fa fa-toggle-on"></i> Интерфейсы UI/UX</a></li>
+	<li><a href="#"><i class="fa fa-rocket"></i> Создание иконок</a></li>
+	<li><a href="#"><i class="fa fa-image"></i> Обработка изображений</a></li>
+	<li><a href="#"><i class="fa fa-object-group"></i> Прототипирование</a></li>
+	<li><a href="#"><i class="fa fa-hand-peace-o"></i> Оффтоп</a></li>
+</ul>
+
+						</nav>
+
+						<div class="box box-sidebar hidden">
+							<a href="#"><img style="max-width: 80%!"(MISSING) class="responsive-img" src="distr/images/img-1-b-wp.png" alt="Создание сайта на WordPress"/></a>
+						</div>
+
+						<div class="box box-sidebar">
+							<div id="vk_groups"></div>
+						</div>
+
+						<div class="box box-comments">
+
+							<div class="box-header">Последние комментарии</div>
+							
+							
+
+						</div>
+
+					</aside>
+
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+	<footer class="main-foot">
+		<div class="container-fluid">
+
+			2018 © WebDesign Master <br/>
+
+			<!-- Google Analytics counter --><!-- /Google Analytics counter -->
+			<!-- Yandex.Metrika counter --> <noscript><div><img src="https://mc.yandex.ru/watch/25346996" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
+
+		</div>
+		<div class="top" title="Наверх"><i class="fa fa-angle-double-up"></i></div>
+	</footer>
+
+	
+
+	
+	
+
+	
+
+
+</body></html>
