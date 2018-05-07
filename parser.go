@@ -157,12 +157,10 @@ func (p *parserOnePage) appEndHeader(doc *goquery.Document) {
 }
 
 func (p *parserOnePage) runRemoveAllTag(doc *goquery.Document) {
-	var el *goquery.Selection
 	for _, val := range p.RemoveAllTag {
 		if val != "" {
 			fmt.Println(doc.Find(val).Attr("src"))
-			el = doc.Find(val)
-			el.Remove()
+			doc.Find(val).Remove()
 		}
 	}
 }
@@ -457,7 +455,7 @@ func (p *parserOnePage) save(doc *goquery.Document, filePatch string) {
 		log.Fatal("Cannot create file", err)
 	}
 
-	fmt.Fprintf(file, html)
+	fmt.Fprint(file, html)
 
 }
 
