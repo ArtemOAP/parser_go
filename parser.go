@@ -18,7 +18,7 @@ import (
 	"time"
 	//"time"
 
-	"./config"
+	"parser_go/config"
 	"github.com/PuerkitoBio/goquery"
 )
 
