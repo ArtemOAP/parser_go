@@ -1,18 +1,22 @@
 package main
 
 import (
+	"bufio"
 	"crypto/md5"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+	//"time"
 
 	"./config"
 	"github.com/PuerkitoBio/goquery"
@@ -77,6 +81,7 @@ func (p *parserOnePage) run() *parserOnePage {
 		p.baseLink = link
 		p.setTempName(name)
 		p.setOptions(false)
+		p.init()
 		p.parsePage(link)
 
 		if p.mob {
@@ -87,6 +92,52 @@ func (p *parserOnePage) run() *parserOnePage {
 
 	return p
 }
+
+func (p *parserOnePage) init() {
+	var err error
+	var file *os.File
+
+	if _, err = os.Stat("./temp/cookies"); !os.IsNotExist(err) {
+		//message("init cookies")
+		file, err = os.Open("./temp/cookies")
+		if err != nil {
+			log.Fatal("Cannot create file", err)
+		}
+		defer file.Close()
+		fileScanner := bufio.NewScanner(file)
+
+		for fileScanner.Scan() {
+
+			name, val, er := Split(fileScanner.Text(), ":")
+			if er == nil {
+
+				expire := time.Now().AddDate(0, 0, 1)
+
+				p.tempCookies = append(p.tempCookies, &http.Cookie{
+					Name:    name,
+					Value:   val,
+					Expires: expire,
+				})
+
+			}
+
+
+		}
+		
+
+	
+
+	}
+}
+
+func Split(str string, del string) (string, string, error) {
+	s := strings.Split(string(str), del)
+	if len(s) < 2 {
+		return "", "", errors.New("Minimum match not found")
+	}
+	return s[0], s[1], nil
+}
+
 func (p *parserOnePage) parsePage(link string) {
 	err, res := p.request(link)
 	defer res.Body.Close()
@@ -113,6 +164,7 @@ func (p *parserOnePage) parsePage(link string) {
 	for i := 1; i < 4; i++ {
 		go p.multiFiles()
 	}
+
 	for name, url := range p.temp_files {
 		chName <- name
 		chUrl <- url
@@ -281,7 +333,11 @@ func (p *parserOnePage) request(url string) (error, *http.Response) {
 	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("User-Agent", p.userAgent)
 	//TODO cookies
-	//fmt.Println(p.tempCookies)
+
+	// cookie := &http.Cookie{
+	// 	Name:  "timestamp",
+	// 	Value: strconv.FormatInt(time.Now().Unix(), 10),
+	// }
 
 	if len(p.tempCookies) > 0 {
 		for _, c := range p.tempCookies {
@@ -303,6 +359,8 @@ func (p *parserOnePage) request(url string) (error, *http.Response) {
 	}
 	if resp != nil {
 		p.tempCookies = resp.Cookies()
+		p.saveCookies(resp.Cookies())
+
 	}
 
 	return nil, resp
@@ -358,9 +416,9 @@ func (p *parserOnePage) saveModifyImg(doc *goquery.Document) map[string]string {
 		name = p.filterFileName(link)
 		if _, err := os.Stat(p.dirs["img"] + name); os.IsNotExist(err) {
 			message("find images :", name)
-			if p.temp_files[name] == "" {
-				name = "img-" + name
-			}
+			// if p.temp_files[name] == "" {
+			// 	name = "img-" + name
+			// }
 			p.temp_files[name] = p.urlAbsolute(link, p.baseLink)
 
 		}
@@ -436,7 +494,11 @@ func (p *parserOnePage) saveFileGo(url string, patch string, name string) {
 		defer out.Close()
 		if err == nil {
 			io.Copy(out, res.Body)
+		} else {
+			message("2. " + err.Error())
 		}
+	} else {
+		message("1. " + err.Error())
 	}
 }
 
@@ -474,6 +536,37 @@ func (p *parserOnePage) setTempName(tempName string) *parserOnePage {
 
 	filter = reg.ReplaceAllString(tempName, "-")
 	p.tempName = p.dir + filter
+
+	return p
+}
+
+func (p *parserOnePage) saveCookies(cookies []*http.Cookie) *parserOnePage {
+
+	var file *os.File
+	var err error
+
+	if _, err = os.Stat("./temp/cookies"); os.IsNotExist(err) {
+		message("create cookies")
+		file, err = os.Create("./temp/cookies")
+		if err != nil {
+			log.Fatal("Cannot create file", err)
+		}
+	} else {
+		file, err = os.OpenFile("./temp/cookies", os.O_APPEND|os.O_WRONLY, 0600)
+		if err != nil {
+			log.Fatal("Not can ride file", err)
+		}
+	}
+	
+
+	for _, val := range cookies {
+	//	fmt.Println("cookies: " + val.Name + ":" + val.Value)
+		fmt.Fprint(file, val.Name+":"+val.Value+"\n")
+
+	}
+	defer file.Close()
+
+	// fmt.Fprint(file, html)
 
 	return p
 }
@@ -530,6 +623,7 @@ func (p *parserOnePage) setOptions(isMob bool) {
 	p.CreateDirIfNotExist(p.dirs["js"])
 	p.CreateDirIfNotExist(p.dirs["img"])
 	p.CreateDirIfNotExist(p.dirs["src"])
+	p.CreateDirIfNotExist("./temp/")
 }
 
 func (p *parserOnePage) CreateDirIfNotExist(dir string) {
@@ -662,8 +756,28 @@ func (p *parserOnePage) urlAbsolute(link string, baseLink string) string {
 }
 
 func (p *parserOnePage) filterFileName(href string) string {
+
 	reg := regexp.MustCompile(`(^.+\/)?(\?.+$)?`)
-	return reg.ReplaceAllString(href, "")
+
+	tempName := reg.ReplaceAllString(href, "")
+
+	if _, ok := p.temp_files[tempName]; ok {
+
+		for {
+			var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+			b := make([]rune, 10)
+			for i := range b {
+				b[i] = letterRunes[rand.Intn(len(letterRunes))]
+			}
+			tempName = "img-" + string(b)
+			if _, ok := p.temp_files[tempName]; !ok {
+				return tempName
+			}
+		}
+
+	}
+	return tempName
+
 }
 
 func (p *parserOnePage) setAgentMob(isMob bool) *parserOnePage {

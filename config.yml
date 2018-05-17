@@ -6,7 +6,7 @@ parser:
        mobAgent: "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
        descAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
        links:
-           'test': 'http://cdfv.pro/preview/?preland_name=XjUoytULkxt4ESy&offer_id=15270'
+           'test': 'https://habr.com/all/page2/'
        countLink: 1
        indexDesc: 'index.php'
        indexMob: 'index2.php'
