@@ -89,7 +89,10 @@ func (p *parserOnePage) run() *parserOnePage {
 			p.parsePage(link)
 		}
 	}
-
+	close(chName)
+	close(chUrl)
+	fmt.Println(<-ch)
+	message("OK All create")
 	return p
 }
 
@@ -121,11 +124,7 @@ func (p *parserOnePage) init() {
 
 			}
 
-
 		}
-		
-
-	
 
 	}
 }
@@ -175,11 +174,8 @@ func (p *parserOnePage) parsePage(link string) {
 		chUrl <- url
 		chTypeSrc <- true
 	}
-	close(chName)
-	close(chUrl)
-	fmt.Println(<-ch)
+
 	message("pages url=", p.baseLink)
-	message("OK All create")
 
 }
 func (p *parserOnePage) multiFiles() {
@@ -557,10 +553,9 @@ func (p *parserOnePage) saveCookies(cookies []*http.Cookie) *parserOnePage {
 			log.Fatal("Not can ride file", err)
 		}
 	}
-	
 
 	for _, val := range cookies {
-	//	fmt.Println("cookies: " + val.Name + ":" + val.Value)
+		//	fmt.Println("cookies: " + val.Name + ":" + val.Value)
 		fmt.Fprint(file, val.Name+":"+val.Value+"\n")
 
 	}

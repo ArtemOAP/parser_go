@@ -7,6 +7,7 @@ parser:
        descAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
        links:
            'test': 'https://habr.com/all/page2/'
+           'test1': 'https://habr.com/all/page1/'
        countLink: 1
        indexDesc: 'index.php'
        indexMob: 'index2.php'
