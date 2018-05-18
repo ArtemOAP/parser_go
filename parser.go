@@ -19,6 +19,7 @@ import (
 	//"time"
 
 	"parser_go/config"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -756,7 +757,7 @@ func (p *parserOnePage) filterFileName(href string) string {
 
 	tempName := reg.ReplaceAllString(href, "")
 
-	if _, ok := p.temp_files[tempName]; ok {
+	if _, ok := p.temp_files[tempName] ; ok || tempName == "" {
 
 		for {
 			var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
