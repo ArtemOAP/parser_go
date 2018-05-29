@@ -1,176 +1,201 @@
 package main
 
 import (
-	"fmt"
 	"crypto/md5"
+	"fmt"
 	"parser_go/config"
+	"reflect"
 	"testing"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
-func (p *parserOnePage) Testrun(t *testing.T) {
-
+func Test_parserOnePage_run(t *testing.T) {
+	tests := []struct {
+		name string
+		p    *parserOnePage
+		want *parserOnePage
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.p.run(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parserOnePage.run() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
-func (p *parserOnePage) Testinit(t *testing.T) {
-
+func Test_parserOnePage_init(t *testing.T) {
+	tests := []struct {
+		name string
+		p    *parserOnePage
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.p.init()
+		})
+	}
 }
 
 func TestSplit(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestparsePage(t *testing.T) {
-
-}
-func (p *parserOnePage) TestmultiFiles(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestappEndHeader(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestrunRemoveAllTag(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestthenBaseHref(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveIco(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveModifyElemHref(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveModifyIframe(t *testing.T) {
-
-}
-func (p *parserOnePage) TestmodifyForm(t *testing.T) {
-
-}
-
-//TODO test
-func (p *parserOnePage) TestreplaceCssInHtml(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveModifyJs(t *testing.T) {
-
-}
-
-func (p *parserOnePage) Testrequest(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveModifayCss(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveModifyImg(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestgetfileSrc(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsrcFilter(t *testing.T) {
-
-}
-
-//saveModifayCss
-
-func (p *parserOnePage) TestsaveFile(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveFileGo(t *testing.T) {
-
-}
-
-func (p *parserOnePage) Testsave(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsetTempName(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsaveCookies(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsetCustomDir(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsetBaseLink(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsetNotIframe(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsetAjax(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsetHrefAllLinks(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestsetOptions(t *testing.T) {
-
-}
-
-func (p *parserOnePage) TestCreateDirIfNotExist(t *testing.T) {
-
-}
-
-func TestGetInstance(t *testing.T) {
-	conf := config.GetConfig()
-	p := getInstance(conf) 
-	if fmt.Sprintf("%T",p) != "*main.parserOnePage"{
-		t.Errorf("GetInstance not parserOnePage %s",fmt.Sprintf("%T",p))
+	type args struct {
+		str string
+		del string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		want1   string
+		wantErr bool
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1, err := Split(tt.args.str, tt.args.del)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Split() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Split() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("Split() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
 	}
 }
 
-func TestUrlAbsolute(t *testing.T) {
+func Test_parserOnePage_parsePage(t *testing.T) {
+	conf := config.GetConfig()
+	p := getInstance(conf)
+	if fmt.Sprintf("%T", p) != "*main.parserOnePage" {
+		t.Errorf("GetInstance not parserOnePage %s", fmt.Sprintf("%T", p))
+	}
+}
 
-	var res string
+func Test_parserOnePage_multiFiles(t *testing.T) {
+	tests := []struct {
+		name string
+		p    *parserOnePage
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.p.multiFiles()
+		})
+	}
+}
+
+func Test_parserOnePage_appEndHeader(t *testing.T) {
+	type args struct {
+		doc *goquery.Document
+	}
+	tests := []struct {
+		name string
+		p    *parserOnePage
+		args args
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.p.appEndHeader(tt.args.doc)
+		})
+	}
+}
+
+func Test_parserOnePage_runRemoveAllTag(t *testing.T) {
+	type args struct {
+		doc *goquery.Document
+	}
+	tests := []struct {
+		name string
+		p    *parserOnePage
+		args args
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.p.runRemoveAllTag(tt.args.doc)
+		})
+	}
+}
+
+func Test_parserOnePage_thenBaseHref(t *testing.T) {
+	type args struct {
+		doc *goquery.Document
+	}
+	tests := []struct {
+		name string
+		p    *parserOnePage
+		args args
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.p.thenBaseHref(tt.args.doc)
+		})
+	}
+}
+
+func Test_getInstance(t *testing.T) {
+	type args struct {
+		conf *config.Config
+	}
+	tests := []struct {
+		name string
+		args args
+		want *parserOnePage
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getInstance(tt.args.conf); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getInstance() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parserOnePage_urlAbsolute(t *testing.T) {
 	conf := config.GetConfig()
 	p := getInstance(conf)
 
-	res = p.urlAbsolute("https://example.com/dfdfdf.img", "https://example2.com/")
-	if res != "https://example.com/dfdfdf.img" {
-		t.Errorf("urlAbsolute 1 not correct -%s", res)
+	type args struct {
+		link     string
+		baseLink string
 	}
-	res = p.urlAbsolute("//example.com/dfdfdf.img", "https://example2.com/")
-	if res != "https://example.com/dfdfdf.img" {
-		t.Errorf("urlAbsolute 2 not correct -%s", res)
+	tests := []struct {
+		name string
+		p    *parserOnePage
+		args args
+		want string
+	}{
+		{"1 test", p, args{"https://example.com/dfdfdf.img", "https://example2.com/"}, "https://example.com/dfdfdf.img"},
+		{"2 test", p, args{"//example.com/dfdfdf.img", "https://example2.com/"}, "https://example.com/dfdfdf.img"},
+		{"3 test", p, args{"/dfdfdf.img", "https://example2.com/page1"}, "https://example2.com/dfdfdf.img"},
+		{"4 test", p, args{"../../dfdfdf.img", "https://example2.com/dir1/dir2/"}, "https://example2.com/dfdfdf.img"},
+		{"5 test", p, args{"dfdfdf.img", "http://example2.com/"}, "http://example2.com/dfdfdf.img"},
+		{"6 test", p, args{"dir1/dir2/dir3/dfdfdf.img", "http://example2.com/"}, "http://example2.com/dir1/dir2/dir3/dfdfdf.img"},
 	}
-	res = p.urlAbsolute("/dfdfdf.img", "https://example2.com/page1")
-	if res != "https://example2.com/dfdfdf.img" {
-		t.Errorf("urlAbsolute 3 not correct -%s", res)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.p.urlAbsolute(tt.args.link, tt.args.baseLink); got != tt.want {
+				t.Errorf("parserOnePage.urlAbsolute() = %v, want %v", got, tt.want)
+			}
+		})
 	}
-	res = p.urlAbsolute("../../dfdfdf.img", "https://example2.com/dir1/dir2/")
-	if res != "https://example2.com/dfdfdf.img" {
-		t.Errorf("urlAbsolute 4 not correct -%s", res)
-	}
-	res = p.urlAbsolute("dfdfdf.img", "http://example2.com/")
-	if res != "http://example2.com/dfdfdf.img" {
-		t.Errorf("urlAbsolute 5 not correct -%s", res)
-	}
-	res = p.urlAbsolute("dir1/dir2/dir3/dfdfdf.img", "http://example2.com/")
-	if res != "http://example2.com/dir1/dir2/dir3/dfdfdf.img" {
-		t.Errorf("urlAbsolute 6 not correct -%s", res)
-	}
-
 }
 
 func TestFilterFileName(t *testing.T) {
@@ -239,13 +264,8 @@ func TestMD5(t *testing.T) {
 	res := MD5("text")
 	b := md5.Sum([]byte("text"))
 
-		if fmt.Sprintf("%x",b)!= res{
-			t.Errorf("TestMD5 1  %s ", res)
-		} 
-	
-	
+	if fmt.Sprintf("%x", b) != res {
+		t.Errorf("TestMD5 1  %s ", res)
+	}
+
 }
-
-// func TestWriteStringToFile(t *testing.T) {
-
-// }
