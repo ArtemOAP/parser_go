@@ -37,7 +37,7 @@ func GetConfig() *Config {
 	}
 	errY := yaml.Unmarshal(source, &conf)
 	if errY != nil {
-		log.Fatalf("File config no valid - error: %v", err)
+		log.Fatalf("File config no valid - error: %v", errY)
 	}
 	return &conf
 }
