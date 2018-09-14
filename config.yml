@@ -6,8 +6,7 @@ parser:
        mobAgent: "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
        descAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
        links:
-           'test': 'https://habr.com/all/page2/'
-           'test1': 'https://habr.com/all/page1/'
+           'test77': 'http://www.foxnews.com/politics/2018/08/22/cohen-more-than-happy-to-talk-to-mueller-and-say-all-that-knows-lawyer-says.html'
        countLink: 1
        indexDesc: 'index.php'
        indexMob: 'index2.php'

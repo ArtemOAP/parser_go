@@ -140,10 +140,10 @@ func Split(str string, del string) (string, string, error) {
 
 func (p *parserOnePage) parsePage(link string) {
 	err, res := p.request(link)
-	defer res.Body.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer res.Body.Close()
 	doc, err := goquery.NewDocumentFromResponse(res)
 	if err != nil {
 		log.Fatal(err)
@@ -316,7 +316,19 @@ func (p *parserOnePage) saveModifyJs(doc *goquery.Document) {
 
 func (p *parserOnePage) request(url string) (error, *http.Response) {
 
-	client := &http.Client{}
+	client := &http.Client{
+
+		CheckRedirect: func() func(req *http.Request, via []*http.Request) error {
+			redirects := 0
+			return func(req *http.Request, via []*http.Request) error {
+				if redirects > 90 {
+					return errors.New("stopped after 12 redirects")
+				}
+				redirects++
+				return nil
+			}
+		}(),
+	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		//TODO log
@@ -757,7 +769,7 @@ func (p *parserOnePage) filterFileName(href string) string {
 
 	tempName := reg.ReplaceAllString(href, "")
 
-	if _, ok := p.temp_files[tempName] ; ok || tempName == "" {
+	if _, ok := p.temp_files[tempName]; ok || tempName == "" {
 
 		for {
 			var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
